@@ -1,0 +1,91 @@
+diff --git a/chrome/app/generated_resources.grd b/chrome/app/generated_resources.grd
+index f853569503..6b8da0f5c5 100644
+--- a/chrome/app/generated_resources.grd
++++ b/chrome/app/generated_resources.grd
+@@ -9521,7 +9521,7 @@ Keep your key file in a safe place. You will need it to create new versions of y
+         Please try again later
+       </message>
+       <message name="IDS_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL" desc="The title of the menu item for showing the Customize Chrome side panel.">
+-        Customize Chrome
++        Theme and colors
+       </message>
+       <if expr="use_titlecase">
+         <message name="IDS_SHOW_CUSTOMIZE_CHROME_TOOLBAR" desc="The title of the menu item for showing the toolbar section of the Customize Chrome side panel.">
+diff --git a/chrome/browser/ui/toolbar/app_menu_model.cc b/chrome/browser/ui/toolbar/app_menu_model.cc
+index bd2dc982ea..c87ead2696 100644
+--- a/chrome/browser/ui/toolbar/app_menu_model.cc
++++ b/chrome/browser/ui/toolbar/app_menu_model.cc
+@@ -81,6 +81,7 @@
+ #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_sub_menu_model.h"
+ #include "chrome/browser/ui/side_panel/side_panel_action_callback.h"
+ #include "chrome/browser/ui/side_panel/side_panel_enums.h"
++#include "chrome/browser/ui/singleton_tabs.h"
+ #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"
+ #include "chrome/browser/ui/tabs/features.h"
+ #include "chrome/browser/ui/tabs/recent_tabs_sub_menu_model.h"
+@@ -1087,10 +1088,8 @@ void ToolsMenuModel::Build(BrowserWindowInterface* browser) {
+     }
+   }
+ 
+-  if (CustomizeChromePageHandler::IsSupported(
+-          NtpCustomBackgroundServiceFactory::GetForProfile(
+-              browser->GetProfile()),
+-          browser->GetProfile())) {
++  // Kelyo moves this item ("Theme and colors") to the main menu.
++  if (false) {
+     AddItemWithStringIdAndVectorIcon(this, IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
+                                      IDS_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
+                                      features::IsRoundedIconsEnabled()
+@@ -1287,6 +1286,13 @@ void AppMenuModel::ExecuteCommand(int command_id, int event_flags) {
+ 
+   LogMenuMetrics(command_id);
+ 
++  // Kelyo: "Theme and colors" opens Kelyo's theme page instead of Chrome's
++  // Customize Chrome side panel.
++  if (command_id == IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL) {
++    ShowSingletonTab(browser_, GURL("chrome://kelyo-theme/"));
++    return;
++  }
++
+   switch (command_id) {
+     case IDC_SHOW_BOOKMARK_SIDE_PANEL:
+     case IDC_SHOW_HISTORY_CLUSTERS_SIDE_PANEL:
+@@ -2463,6 +2469,13 @@ void AppMenuModel::Build() {
+ #endif
+ #endif
+ 
++  // Kelyo: its theme page, in the main menu (see ExecuteCommand()).
++  AddItemWithStringIdAndVectorIcon(this, IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
++                                   IDS_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
++                                   features::IsRoundedIconsEnabled()
++                                       ? kEditIcon
++                                       : kEditChromeRefreshOldIcon);
++
+   AddItemWithStringIdAndVectorIcon(
+       this, IDC_OPTIONS, IDS_SETTINGS,
+       features::IsRoundedIconsEnabled() ? kSettingsIcon : kSettingsMenuOldIcon);
+diff --git a/chrome/browser/ui/views/frame/themed_background.cc b/chrome/browser/ui/views/frame/themed_background.cc
+index 169aee34fb..9c5bbfedbf 100644
+--- a/chrome/browser/ui/views/frame/themed_background.cc
++++ b/chrome/browser/ui/views/frame/themed_background.cc
+@@ -9,6 +9,7 @@
+ #include "chrome/browser/themes/theme_properties.h"
+ #include "chrome/browser/ui/color/chrome_color_id.h"
+ #include "chrome/browser/ui/views/frame/browser_view.h"
++#include "chrome/browser/ui/views/frame/kelyo_theme_painter.h"
+ #include "chrome/browser/ui/views/frame/top_container_view.h"
+ #include "chrome/browser/ui/views/tabs/tab_strip.h"
+ #include "chrome/grit/theme_resources.h"
+@@ -107,6 +108,12 @@ void ThemedBackground::PaintBackground(gfx::Canvas* canvas,
+                                        const views::View* view,
+                                        const BrowserView* browser_view,
+                                        ThemeChoice theme_choice) {
++  // Kelyo's gradient theme replaces the frame colour (sidebar, window-button
++  // band, and the toolbar while it's in the sidebar).
++  if (theme_choice == ThemeChoice::kFrameTheme &&
++      kelyo::PaintThemeGradient(canvas, view, browser_view)) {
++    return;
++  }
+   bool painted =
+       PaintThemeCustomImage(canvas, view, browser_view, theme_choice);
+   if (!painted) {

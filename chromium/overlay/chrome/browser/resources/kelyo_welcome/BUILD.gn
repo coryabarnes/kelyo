@@ -1,7 +1,7 @@
-# Copyright 2026 Kite. Use of this source code is governed by a BSD-style
+# Copyright 2026 Kelyo. Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 #
-# The page itself lives in the Kite repository (chromium/welcome/) and is
+# The page itself lives in the Kelyo repository (chromium/welcome/) and is
 # copied here by chromium/apply.sh.
 
 import("//chrome/common/features.gni")
@@ -10,6 +10,10 @@ import("//ui/webui/resources/tools/generate_grd.gni")
 
 files = [
   "music.js",
+  "theme.css",
+  "theme.html",
+  "theme.js",
+  "themes.js",
   "welcome.css",
   "welcome.html",
   "welcome.js",
@@ -23,16 +27,16 @@ grit("resources") {
   inputs = files
   deps = [ ":build_grd" ]
   outputs = [
-    "grit/kite_welcome_resources.h",
-    "grit/kite_welcome_resources_map.h",
-    "grit/kite_welcome_resources_map.cc",
-    "kite_welcome_resources.pak",
+    "grit/kelyo_welcome_resources.h",
+    "grit/kelyo_welcome_resources_map.h",
+    "grit/kelyo_welcome_resources_map.cc",
+    "kelyo_welcome_resources.pak",
   ]
   output_dir = "$root_gen_dir/chrome"
 }
 
 generate_grd("build_grd") {
-  grd_prefix = "kite_welcome"
+  grd_prefix = "kelyo_welcome"
   out_grd = "$target_gen_dir/resources.grd"
   input_files = files
   input_files_base_dir = rebase_path(".", "//")

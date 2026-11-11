@@ -7,7 +7,7 @@ index f121d12d95..17fa881d33 100644
        return base::Hours(4);
      case MemorySaverModeAggressiveness::kAggressive:
 -      return base::Hours(2);
-+      // Kite: tabs nap after half an hour in the background.
++      // Kelyo: tabs nap after half an hour in the background.
 +      return base::Minutes(30);
    }
    NOTREACHED();

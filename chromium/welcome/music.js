@@ -1,4 +1,4 @@
-// Kite's welcome tune: an original, generative ambient piece in D major,
+// Kelyo's welcome tune: an original, generative ambient piece in D major,
 // synthesized live with Web Audio (no recordings).
 //
 // Four chords drift by, eight seconds each (Dmaj9, Bm11, Gmaj7#11, Asus),

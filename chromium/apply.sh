@@ -1,5 +1,5 @@
 #!/bin/sh
-# Applies Kite's changes to a Chromium checkout. Safe to run more than once.
+# Applies Kelyo's changes to a Chromium checkout. Safe to run more than once.
 #
 #   chromium/apply.sh ~/chromium/src
 #
@@ -14,20 +14,20 @@ cd "$src"
 
 echo "Branding: name"
 sed -i \
-  -e 's/^COMPANY_FULLNAME=.*/COMPANY_FULLNAME=Kite/' \
-  -e 's/^COMPANY_SHORTNAME=.*/COMPANY_SHORTNAME=Kite/' \
-  -e 's/^PRODUCT_FULLNAME=.*/PRODUCT_FULLNAME=Kite/' \
-  -e 's/^PRODUCT_SHORTNAME=.*/PRODUCT_SHORTNAME=Kite/' \
-  -e 's/^PRODUCT_INSTALLER_FULLNAME=.*/PRODUCT_INSTALLER_FULLNAME=Kite Installer/' \
-  -e 's/^PRODUCT_INSTALLER_SHORTNAME=.*/PRODUCT_INSTALLER_SHORTNAME=Kite Installer/' \
-  -e 's/^COPYRIGHT=.*/COPYRIGHT=Copyright @LASTCHANGE_YEAR@ Kite and The Chromium Authors./' \
+  -e 's/^COMPANY_FULLNAME=.*/COMPANY_FULLNAME=Kelyo/' \
+  -e 's/^COMPANY_SHORTNAME=.*/COMPANY_SHORTNAME=Kelyo/' \
+  -e 's/^PRODUCT_FULLNAME=.*/PRODUCT_FULLNAME=Kelyo/' \
+  -e 's/^PRODUCT_SHORTNAME=.*/PRODUCT_SHORTNAME=Kelyo/' \
+  -e 's/^PRODUCT_INSTALLER_FULLNAME=.*/PRODUCT_INSTALLER_FULLNAME=Kelyo Installer/' \
+  -e 's/^PRODUCT_INSTALLER_SHORTNAME=.*/PRODUCT_INSTALLER_SHORTNAME=Kelyo Installer/' \
+  -e 's/^COPYRIGHT=.*/COPYRIGHT=Copyright @LASTCHANGE_YEAR@ Kelyo and The Chromium Authors./' \
   chrome/app/theme/chromium/BRANDING
 # User-visible strings ("Chromium is up to date", "About Chromium", ...), in
 # every language. Whole words only, so ids and "ChromiumOS" are untouched.
-sed -i 's/\bChromium\b/Kite/g' chrome/app/chromium_strings.grd chrome/app/resources/chromium_strings_*.xtb
+sed -i 's/\bChromium\b/Kelyo/g' chrome/app/chromium_strings.grd chrome/app/resources/chromium_strings_*.xtb
 
-echo "Branding: profile folder (~/.config/kite)"
-sed -i 's/std::string data_dir_basename = "chromium";/std::string data_dir_basename = "kite";/' \
+echo "Branding: profile folder (~/.config/kelyo)"
+sed -i 's/std::string data_dir_basename = "chromium";/std::string data_dir_basename = "kelyo";/' \
   chrome/common/chrome_paths_linux.cc
 
 echo "Branding: icons"
@@ -41,9 +41,8 @@ magick "$logo" -resize 32x32 chrome/app/theme/chromium/linux/product_logo_32.xpm
 
 echo "New files (overlay/, and the welcome page)"
 cp -r "$here/overlay/." .
-cp "$here"/welcome/welcome.html "$here"/welcome/welcome.css \
-   "$here"/welcome/welcome.js "$here"/welcome/music.js \
-   chrome/browser/resources/kite_welcome/
+cp "$here"/welcome/*.html "$here"/welcome/*.css "$here"/welcome/*.js \
+   chrome/browser/resources/kelyo_welcome/
 
 echo "Code changes"
 for patch in "$here"/patches/*.patch; do

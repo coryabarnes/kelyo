@@ -1,8 +1,9 @@
 // The first-run welcome: steps through a few screens over a twilight sky,
-// with Kite's welcome tune playing. Written for Chrome's WebUI rules: no
+// with Kelyo's welcome tune playing. Written for Chrome's WebUI rules: no
 // inline scripts and no innerHTML (Trusted Types).
 
 import {WelcomeTune} from './music.js';
+import {cssGradient, DEFAULT_GRAIN, getTheme, PRESETS, setTheme} from './themes.js';
 
 const tune = new WelcomeTune();
 const steps = [...document.querySelectorAll('.step')];
@@ -76,6 +77,30 @@ document.getElementById('start').addEventListener('click', event => {
     location.href = href;
   }, 1700);
 });
+
+// "Make it yours": the first six themes, applied to the browser on click.
+const themesEl = document.getElementById('themes');
+function markChosenTheme(colors) {
+  for (const button of themesEl.children) {
+    const preset = PRESETS[Number(button.dataset.index)];
+    button.setAttribute('aria-pressed',
+        String(preset.colors.join() === colors.join()));
+  }
+}
+PRESETS.slice(0, 6).forEach((preset, index) => {
+  const button = document.createElement('button');
+  button.className = 'theme';
+  button.dataset.index = String(index);
+  button.title = preset.name;
+  button.setAttribute('aria-label', preset.name);
+  button.style.background = cssGradient(preset.colors);
+  button.addEventListener('click', () => {
+    setTheme(preset.colors, DEFAULT_GRAIN);
+    markChosenTheme(preset.colors);
+  });
+  themesEl.append(button);
+});
+getTheme().then(theme => markChosenTheme(theme.colors));
 
 // Stars: a few hundred points that twinkle slowly.
 const canvas = document.getElementById('stars');

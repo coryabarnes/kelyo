@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Welcome to Kite</title>
+  <title>Welcome to Kelyo</title>
   <link rel="stylesheet" href="welcome.css">
   <script type="module" src="welcome.js"></script>
 </head>
@@ -31,30 +31,40 @@
               fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.6" stroke-linecap="round"/>
         <path d="M57 134 l6 4 l-6 4 Z M60 158 l6 4 l-6 4 Z" fill="#ffd38a" opacity=".9"/>
       </svg>
-      <h1 id="hello-title" class="wordmark">Kite</h1>
-      <p class="lede">A calmer way through the web.</p>
+      <h1 id="hello-title" class="wordmark">Kelyo</h1>
+      <p class="lede">The web. On your terms.</p>
       <button class="primary" id="begin">Begin</button>
     </section>
 
     <section class="step" id="step-tour" aria-labelledby="tour-title">
-      <h2 id="tour-title">Light on its feet.</h2>
+      <h2 id="tour-title">Three promises.</h2>
       <ul class="cards">
         <li>
-          <span class="icon" aria-hidden="true">◫</span>
-          <h3>Room to think</h3>
-          <p>Tabs live in the sidebar, and two pages can sit side by side.</p>
-        </li>
-        <li>
           <span class="icon" aria-hidden="true">🛡</span>
-          <h3>Ads stay out</h3>
-          <p>uBlock Origin Lite comes built in, so trackers and banners never load.</p>
+          <h3>Privacy by default</h3>
+          <p>Ads and trackers are blocked from the first page, and nothing ties your browsing to an account.</p>
         </li>
         <li>
           <span class="icon" aria-hidden="true">✦</span>
-          <h3>Your extensions come along</h3>
-          <p>It's Chromium inside, so the Chrome Web Store just works.</p>
+          <h3>Intelligence by choice</h3>
+          <p>No AI runs in the background. If you want help from it, you turn it on.</p>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">◫</span>
+          <h3>Freedom by design</h3>
+          <p>Your extensions from the Chrome Web Store, your sidebar, your colours, your data.</p>
         </li>
       </ul>
+      <button class="primary" data-next>Continue</button>
+    </section>
+
+    <section class="step" id="step-colors" aria-labelledby="colors-title">
+      <h2 id="colors-title">Make it yours.</h2>
+      <p class="lede">Pick a sky for your sidebar. You can change it any time at chrome://kelyo-theme.</p>
+      <div class="themes" id="themes"></div>
+      <div class="row">
+        <a class="secondary" href="chrome://kelyo-theme/">More colours</a>
+      </div>
       <button class="primary" data-next>Continue</button>
     </section>
 
@@ -82,8 +92,9 @@
   <nav class="dots" aria-label="Welcome steps">
     <button class="dot active" aria-label="Hello" data-step="0"></button>
     <button class="dot" aria-label="Tour" data-step="1"></button>
-    <button class="dot" aria-label="Bring your things" data-step="2"></button>
-    <button class="dot" aria-label="Ready" data-step="3"></button>
+    <button class="dot" aria-label="Make it yours" data-step="2"></button>
+    <button class="dot" aria-label="Bring your things" data-step="3"></button>
+    <button class="dot" aria-label="Ready" data-step="4"></button>
   </nav>
 
   <button class="sound" id="sound" aria-pressed="false" title="Music">

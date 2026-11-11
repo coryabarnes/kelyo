@@ -1,5 +1,5 @@
 {
-  "first_run_tabs": ["chrome://kite-welcome/"],
+  "first_run_tabs": ["chrome://kelyo-welcome/"],
   "browser": {
     "theme": {"color_scheme2": 2},
     "show_home_button": false

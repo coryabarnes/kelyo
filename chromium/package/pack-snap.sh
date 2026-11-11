@@ -1,10 +1,10 @@
 #!/bin/sh
-# Packs a Kite build (Chromium out dir) into a classic snap.
+# Packs a Kelyo build (Chromium out dir) into a classic snap.
 #
-#   chromium/package/pack-snap.sh ~/chromium/src/out/Kite [version]
+#   chromium/package/pack-snap.sh ~/chromium/src/out/Kelyo [version]
 #
 # Install the result with:
-#   pkexec snap install --dangerous --classic kite_<version>_amd64.snap
+#   pkexec snap install --dangerous --classic kelyo_<version>_amd64.snap
 set -eu
 
 out=${1:?usage: pack-snap.sh <chromium out dir> [version]}
@@ -13,7 +13,7 @@ version=${2:-$(. "$out/../../chrome/VERSION"; echo "$MAJOR.$MINOR.$BUILD.$PATCH"
 root=$(mktemp -d)
 chmod 755 "$root"  # mktemp makes it private; snaps must be world-readable.
 trap 'rm -rf "$root"' EXIT
-app="$root/kite"
+app="$root/kelyo"
 
 mkdir -p "$app" "$root/bin" "$root/meta/gui"
 
@@ -32,61 +32,64 @@ done
 find "$app" -maxdepth 1 -type f \( -name chrome -o -name chrome_crashpad_handler -o -name '*.so*' \) \
   -exec strip --strip-unneeded {} +
 
-# Kite's defaults: first-run welcome, dark theme, DuckDuckGo, uBlock Origin Lite.
+# Kelyo's defaults: first-run welcome, dark theme, DuckDuckGo, uBlock Origin Lite.
 cp "$here/initial_preferences" "$app/"
 cp -r "$here/extensions" "$app/"
 
-cat > "$root/bin/kite" <<'EOF'
+cat > "$root/bin/kelyo" <<'EOF'
 #!/bin/sh
-# Tells Kite which launcher entry is its own, so the window groups with its icon.
-export CHROME_DESKTOP=kite_kite.desktop
-# Kite stays light: no Gemini assistant, Lens, shopping helpers, AI history
+# Tells Kelyo which launcher entry is its own, so the window groups with its icon.
+export CHROME_DESKTOP=kelyo_kelyo.desktop
+# Kelyo stays light: no Gemini assistant, Lens, shopping helpers, AI history
 # search, or background downloads of AI models and optimization hints.
-exec "$SNAP/kite/chrome" --class=kite \
+exec "$SNAP/kelyo/chrome" --class=kelyo \
   --disable-features=Glic,GlicRollout,ApiGlicPrivate,ApiContextualTasksPrivate,HistoryEmbeddings,LensOverlay,LensStandalone,MerchantTrust,ShoppingList,OptimizationHints,OptimizationTargetPrediction,OptimizationGuideModelExecution,OnDeviceModelBackgroundDownload,ModelQualityLogging \
   "$@"
 EOF
-chmod 755 "$root/bin/kite"
+chmod 755 "$root/bin/kelyo"
 
-cp "$here/../branding/kite-icon.svg" "$root/meta/gui/kite.svg"
-cat > "$root/meta/gui/kite.desktop" <<'EOF'
+cp "$here/../branding/kelyo-icon.svg" "$root/meta/gui/kelyo.svg"
+cat > "$root/meta/gui/kelyo.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
-Name=Kite
+Name=Kelyo
 GenericName=Web Browser
-Comment=A calmer way through the web
-Exec=kite %U
-Icon=${SNAP}/meta/gui/kite.svg
+Comment=The web. On your terms.
+Exec=kelyo %U
+Icon=${SNAP}/meta/gui/kelyo.svg
 Terminal=false
 Categories=Network;WebBrowser;
 MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
 StartupNotify=true
-StartupWMClass=kite
+StartupWMClass=kelyo
 Actions=new-window;new-private-window;
 
 [Desktop Action new-window]
 Name=New Window
-Exec=kite
+Exec=kelyo
 
 [Desktop Action new-private-window]
 Name=New Incognito Window
-Exec=kite --incognito
+Exec=kelyo --incognito
 EOF
 
 cat > "$root/meta/snap.yaml" <<EOF
-name: kite
+name: kelyo
 version: '$version'
-summary: A calmer way through the web
+summary: Kelyo Browser. The web. On your terms.
 description: |
-  Kite is a Chromium-based browser with tabs in a sidebar, split view,
-  built-in ad blocking, and the Chrome Web Store.
+  Kelyo Browser is a Chromium-based browser built on three promises:
+  privacy by default, intelligence by choice, and freedom by design.
+  Tabs and the address bar live in a sidebar painted with your own
+  gradient theme, uBlock Origin Lite blocks ads and trackers, and the
+  Chrome Web Store works as usual.
 architectures: [amd64]
 base: core24
 confinement: classic
 grade: devel
 apps:
-  kite:
-    command: bin/kite
+  kelyo:
+    command: bin/kelyo
 EOF
 
 snap pack "$root" "$(pwd)"

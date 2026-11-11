@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Kelyo theme</title>
+  <link rel="stylesheet" href="theme.css">
+  <script type="module" src="theme.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Make it yours</h1>
+      <p>Paint Kelyo's sidebar with a gradient. Changes apply right away.</p>
+    </header>
+
+    <section class="preview" aria-label="Preview">
+      <div class="window">
+        <div class="sidebar" id="preview-sidebar">
+          <div class="grain" id="preview-grain"></div>
+          <div class="lights"><i></i><i></i><i></i></div>
+          <div class="address"></div>
+          <div class="tab active"></div>
+          <div class="tab"></div>
+          <div class="tab short"></div>
+        </div>
+        <div class="page">
+          <div class="line wide"></div>
+          <div class="line"></div>
+          <div class="block"></div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="presets-title">
+      <h2 id="presets-title">Themes</h2>
+      <div class="presets" id="presets"></div>
+    </section>
+
+    <section aria-labelledby="custom-title">
+      <h2 id="custom-title">Your own</h2>
+      <div class="custom">
+        <div class="wells" id="wells"></div>
+        <button class="round" id="add-color" title="Add a colour" aria-label="Add a colour">+</button>
+        <button class="round" id="remove-color" title="Remove a colour" aria-label="Remove a colour">−</button>
+      </div>
+      <label class="slider">
+        <span>Grain</span>
+        <input type="range" id="grain" min="0" max="1" step="0.01">
+      </label>
+    </section>
+
+    <footer>
+      <button class="text" id="reset">Back to Kelyo's default</button>
+    </footer>
+  </main>
+</body>
+</html>

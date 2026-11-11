@@ -1,0 +1,352 @@
+diff --git a/chrome/browser/ui/views/frame/browser_frame_view_linux.cc b/chrome/browser/ui/views/frame/browser_frame_view_linux.cc
+index 474b8356af..96882dfaa5 100644
+--- a/chrome/browser/ui/views/frame/browser_frame_view_linux.cc
++++ b/chrome/browser/ui/views/frame/browser_frame_view_linux.cc
+@@ -4,6 +4,9 @@
+ 
+ #include "chrome/browser/ui/views/frame/browser_frame_view_linux.h"
+ 
++#include <algorithm>
++#include <vector>
++
+ #include "base/notreached.h"
+ #include "chrome/browser/ui/views/chrome_layout_provider.h"
+ #include "chrome/browser/ui/views/frame/browser_native_widget_aura_linux.h"
+@@ -26,6 +29,25 @@ namespace {
+ // bottom resize borders.
+ constexpr int kResizeTopBorderThickness = 4;
+ 
++
++// Kelyo keeps the window buttons on the left, at the top of the sidebar (like
++// Ardia), in close / minimize / maximize order. The desktop still decides
++// which buttons there are.
++std::vector<views::FrameButton> KelyoLeadingButtons() {
++  auto* const provider = views::WindowButtonOrderProvider::GetInstance();
++  std::vector<views::FrameButton> all = provider->leading_buttons();
++  all.insert(all.end(), provider->trailing_buttons().begin(),
++             provider->trailing_buttons().end());
++  std::vector<views::FrameButton> ordered;
++  for (auto button : {views::FrameButton::kClose, views::FrameButton::kMinimize,
++                      views::FrameButton::kMaximize}) {
++    if (std::ranges::find(all, button) != all.end()) {
++      ordered.push_back(button);
++    }
++  }
++  return ordered;
++}
++
+ }  // namespace
+ 
+ BrowserFrameViewLinux::BrowserFrameViewLinux(
+@@ -96,9 +118,7 @@ bool BrowserFrameViewLinux::ShouldDrawRestoredFrameShadow() const {
+ }
+ 
+ void BrowserFrameViewLinux::OnWindowButtonOrderingChange() {
+-  auto* provider = views::WindowButtonOrderProvider::GetInstance();
+-  layout_->SetButtonOrdering(provider->leading_buttons(),
+-                             provider->trailing_buttons());
++  layout_->SetButtonOrdering(KelyoLeadingButtons(), {});
+ 
+   // We can receive OnWindowButtonOrderingChange events before we've been added
+   // to a Widget. We need a Widget because layout crashes due to dependencies
+@@ -152,13 +172,10 @@ BrowserLayoutParams BrowserFrameViewLinux::GetBrowserLayoutParams() const {
+                                        /*leading_spacing=*/false,
+                                        /*is_leading_button=*/false);
+ 
+-  // On Linux, buttons may be split between leading and trailing.
+-  // Account for both in the exclusion areas.
+-
+-  auto* const provider = views::WindowButtonOrderProvider::GetInstance();
++  // Kelyo puts all window buttons on the leading edge (KelyoLeadingButtons()).
+ 
+   gfx::Rect leading_bounds;
+-  for (auto button : provider->leading_buttons()) {
++  for (auto button : KelyoLeadingButtons()) {
+     if (auto* const button_view = layout_->GetFrameButton(button);
+         button_view && button_view->GetVisible()) {
+       leading_bounds.Union(button_view->bounds());
+@@ -171,32 +188,19 @@ BrowserLayoutParams BrowserFrameViewLinux::GetBrowserLayoutParams() const {
+     params.leading_exclusion.horizontal_padding = caption_margin;
+   }
+ 
+-  gfx::Rect trailing_bounds;
+-  for (auto button : provider->trailing_buttons()) {
+-    if (auto* const button_view = layout_->GetFrameButton(button);
+-        button_view && button_view->GetVisible()) {
+-      trailing_bounds.Union(button_view->bounds());
+-    }
+-  }
+-  if (!trailing_bounds.IsEmpty()) {
+-    params.trailing_exclusion.content =
+-        gfx::SizeF(params.visual_client_area.right() - trailing_bounds.x(),
+-                   trailing_bounds.bottom() - params.visual_client_area.y());
+-    params.trailing_exclusion.horizontal_padding = caption_margin;
+-  }
++  // Kelyo has no trailing window buttons (see KelyoLeadingButtons()), so there
++  // is no trailing exclusion.
+ 
+   MaybeAddAppIconToLayoutParams(params);
+   return params;
+ }
+ 
+ bool BrowserFrameViewLinux::CaptionButtonsOnLeadingEdge() const {
+-  auto* const provider = views::WindowButtonOrderProvider::GetInstance();
+-  return !provider->leading_buttons().empty();
++  return !KelyoLeadingButtons().empty();
+ }
+ 
+ bool BrowserFrameViewLinux::CaptionButtonsOnTrailingEdge() const {
+-  auto* const provider = views::WindowButtonOrderProvider::GetInstance();
+-  return !provider->trailing_buttons().empty();
++  return false;  // Kelyo: see KelyoLeadingButtons().
+ }
+ 
+ BrowserFrameViewLinux::BoundsAndMargins
+diff --git a/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc b/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
+index 7764d4a472..8c124f9f0e 100644
+--- a/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
++++ b/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
+@@ -38,6 +38,7 @@
+ #include "chrome/browser/ui/views/frame/multi_contents_view.h"
+ #include "chrome/browser/ui/views/frame/shadow_frame_view.h"
+ #include "chrome/browser/ui/views/frame/tab_strip_region_view.h"
++#include "chrome/browser/ui/views/frame/kelyo_sidebar.h"
+ #include "chrome/browser/ui/views/frame/vertical_tab_strip_background_blur_backdrop.h"
+ #include "chrome/browser/ui/views/frame/vertical_tab_strip_region_view.h"
+ #include "chrome/browser/ui/views/infobars/infobar_container_view.h"
+@@ -883,6 +884,28 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
+   bool clip_content_for_animation = false;
+   gfx::Rect unclipped_contents_region = params.visual_client_area;
+ 
++  // Kelyo: with the vertical tab strip expanded (and not in fullscreen), the
++  // toolbar moves into the top of the tab strip, so pages run to the top of
++  // the window. Collapsed or fullscreen, Chrome's usual top toolbar returns.
++  const bool kelyo_toolbar_in_sidebar =
++      layout_data_->tab_strip_type == TabStripType::kVertical &&
++      horizontal_layout.vertical_tab_strip_collapsed_state ==
++          VerticalTabStripCollapsedState::kExpanded &&
++      (layout_data_->window_state == WindowState::kNormal ||
++       layout_data_->window_state == WindowState::kMaximized) &&
++      IsParentedTo(views().top_container, views().browser_view) &&
++      IsParentedTo(views().toolbar, views().top_container) &&
++      delegate().IsToolbarVisible() &&
++      // Window buttons on the right would sit over the page; keep Chrome's
++      // toolbar then. (Kelyo puts them on the left; see BrowserFrameViewLinux.)
++      layout_data_->revised_params.trailing_exclusion.content.IsEmpty();
++  if (views().toolbar &&
++      views().toolbar->GetProperty(kKelyoToolbarInSidebarKey) !=
++          kelyo_toolbar_in_sidebar) {
++    views().toolbar->SetProperty(kKelyoToolbarInSidebarKey,
++                                 kelyo_toolbar_in_sidebar);
++  }
++
+   // Lay out vertical tab strip if visible.
+   int collapsed_vertical_tab_strip_adjustment = 0;
+   const VerticalTabStripAnimation& vertical_tab_strip_animation =
+@@ -937,6 +960,38 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
+             gfx::Insets::TLBR(views::Separator::kThickness, 0, 0, 0));
+       }
+ 
++      // Kelyo: the window buttons get a band at the top of the sidebar, then
++      // the toolbar (two rows), then the tabs.
++      if (kelyo_toolbar_in_sidebar) {
++        const int caption_band = base::ClampCeil(
++            params.leading_exclusion.ContentWithPadding().height());
++        gfx::Rect column = vertical_tab_strip_bounds;
++        column.Inset(gfx::Insets::TLBR(caption_band, 0, 0, 0));
++        BrowserLayoutParams column_params = params.WithClientArea(column);
++        column_params.leading_exclusion = BrowserLayoutExclusionArea();
++        column_params.trailing_exclusion = BrowserLayoutExclusionArea();
++
++        auto& top_container_layout =
++            layout.AddChild(views().top_container, gfx::Rect());
++        const gfx::Rect top_container_local_bounds =
++            CalculateTopContainerLayout(
++                top_container_layout, column_params.InLocalCoordinates(column),
++                /*needs_exclusion=*/false);
++        // The top container also covers the window-button band (its
++        // background shows behind the buttons), with its contents below it.
++        top_container_layout.bounds = gfx::Rect(
++            column.x(), vertical_tab_strip_bounds.y(), column.width(),
++            caption_band + top_container_local_bounds.height());
++        for (auto& [child, child_layout] : top_container_layout.children) {
++          if (!child_layout.bounds.IsEmpty()) {
++            child_layout.bounds.Offset(0, caption_band);
++          }
++        }
++        vertical_tab_strip_bounds.Inset(gfx::Insets::TLBR(
++            caption_band + top_container_local_bounds.height(), 0, 0, 0));
++        needs_exclusion = false;
++      }
++
+       views().vertical_tab_strip_region_view->SetOrganizerPanelShowPercent(
+           layout_data_->organizer_panel_animation.location ==
+                       OrganizerPanelLocation::kVerticalTabStrip ||
+@@ -1037,7 +1092,7 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
+ 
+   // When the tabstrip isn't at the top or in constrained widths, the top
+   // container is laid out before all side panels.
+-  if (horizontal_layout.force_top_container_to_top &&
++  if (!kelyo_toolbar_in_sidebar && horizontal_layout.force_top_container_to_top &&
+       IsParentedTo(views().top_container, views().browser_view)) {
+     auto& top_container_layout =
+         layout.AddChild(views().top_container, gfx::Rect());
+@@ -1173,7 +1228,8 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
+   // Lay out top container. The top container is laid out after the
+   // toolbar-height side panel with a horizontal tabstrip if the browser is wide
+   // enough.
+-  if (!horizontal_layout.force_top_container_to_top &&
++  if (!kelyo_toolbar_in_sidebar &&
++      !horizontal_layout.force_top_container_to_top &&
+       IsParentedTo(views().top_container, views().browser_view)) {
+     auto& top_container_layout =
+         layout.AddChild(views().top_container, gfx::Rect());
+@@ -1346,6 +1402,10 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
+           base::ClampCeil(browser_params.leading_exclusion.content.width()) -
+           tabstrip_bounds->x();
+     }
++    if (kelyo_toolbar_in_sidebar) {
++      toolbar_height = 0;
++      caption_button_width = 0;
++    }
+ 
+     views().vertical_tab_strip_region_view->SetToolbarHeightForLayout(
+         std::max(0, toolbar_height));
+@@ -1504,16 +1564,31 @@ void BrowserViewTabbedLayoutImpl::ConfigureTopContainerBackground(
+   // parented to the `top_container()` and the frame header is not visible.
+   // In these cases, the top container's background color should match the
+   // frame color to ensure visual consistency.
++  // Kelyo: in the sidebar, the toolbar shares the sidebar's (frame) background,
++  // which is where Kelyo's gradient theme is painted.
++  const bool kelyo_toolbar_in_sidebar =
++      views().toolbar && views().toolbar->GetProperty(kKelyoToolbarInSidebarKey);
+   if (layout_data_->tab_strip_type == TabStripType::kHorizontal &&
+       IsParentedTo(views().horizontal_tab_strip_region_view,
+                    views().top_container)) {
+     background->SetPrimaryColor(ui::kColorFrameActive);
++  } else if (kelyo_toolbar_in_sidebar) {
++    background->SetPrimaryColor(CustomCornersBackground::FrameTheme());
+   } else {
+     background->SetPrimaryColor(CustomCornersBackground::ToolbarTheme());
+   }
+ 
+   // By default, this is just a flat background.
+   CustomCornersBackground::Corners corners;
++  if (kelyo_toolbar_in_sidebar) {
++    // It fills the window's top leading corner.
++    if (layout_data_->window_state == WindowState::kNormal) {
++      corners[CornerOrientation::kTopLeading] =
++          background->GetWindowCorner(/*upper=*/true);
++    }
++    background->SetCorners(corners);
++    return;
++  }
+ 
+   // Round top corners when `top_container` reaches the top edge of a
+   // non-maximized, non-fullscreen window.
+diff --git a/chrome/browser/ui/views/toolbar/toolbar_view.cc b/chrome/browser/ui/views/toolbar/toolbar_view.cc
+index 184ae3e5bc..9bef9e2088 100644
+--- a/chrome/browser/ui/views/toolbar/toolbar_view.cc
++++ b/chrome/browser/ui/views/toolbar/toolbar_view.cc
+@@ -4,6 +4,8 @@
+ 
+ #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
+ 
++#include "chrome/browser/ui/views/frame/kelyo_sidebar.h"
++
+ #include <algorithm>
+ #include <memory>
+ #include <utility>
+@@ -1462,6 +1464,48 @@ gfx::Size ToolbarView::GetMinimumSize() const {
+   return size;
+ }
+ 
++namespace {
++
++// Space between Kelyo's two toolbar rows, and around the address bar row.
++constexpr int kKelyoAddressRowGap = 6;
++
++bool IsInKelyoSidebar(const views::View* toolbar) {
++  return toolbar->GetProperty(kKelyoToolbarInSidebarKey);
++}
++
++}  // namespace
++
++void ToolbarView::AfterPropertyChange(const void* key, int64_t old_value) {
++  AccessiblePaneView::AfterPropertyChange(key, old_value);
++  if (key != kKelyoToolbarInSidebarKey) {
++    return;
++  }
++  // In the sidebar the toolbar shows the sidebar's background (and Kelyo's
++  // gradient theme) rather than the toolbar colour.
++  if (display_mode_ == DisplayMode::kNormal && background()) {
++    auto* corners_background =
++        static_cast<CustomCornersBackground*>(background());
++    if (IsInKelyoSidebar(this)) {
++      corners_background->SetPrimaryColor(CustomCornersBackground::FrameTheme());
++    } else {
++      corners_background->SetPrimaryColor(
++          CustomCornersBackground::ToolbarTheme());
++    }
++    SchedulePaint();
++  }
++  // In the sidebar the address bar gets its own row, so the buttons' flex
++  // layout leaves it out and Layout() places it below them.
++  if (location_bar_view_) {
++    location_bar_view_->SetProperty(views::kViewIgnoredByLayoutKey,
++                                    IsInKelyoSidebar(this));
++  }
++  if (initialized_ && display_mode_ == DisplayMode::kNormal) {
++    LayoutCommon();
++  }
++  InvalidateLayout();
++  PreferredSizeChanged();
++}
++
+ void ToolbarView::Layout(PassKey) {
+   // If we have not been initialized yet just do nothing.
+   if (!initialized_) {
+@@ -1501,6 +1545,17 @@ void ToolbarView::Layout(PassKey) {
+   // Call super implementation to ensure layout manager and child layouts
+   // happen.
+   LayoutSuperclass<AccessiblePaneView>(this);
++
++  // Kelyo: in the sidebar, the address bar spans the second row.
++  if (display_mode_ == DisplayMode::kNormal && IsInKelyoSidebar(this) &&
++      location_bar_view_ && location_bar_view_->GetVisible()) {
++    const int row_height = location_bar_view_->GetPreferredSize().height();
++    const int margin = GetLayoutConstant(LayoutConstant::kLocationBarMargin) +
++                       kKelyoAddressRowGap;
++    location_bar_view_->SetBounds(
++        margin, height() - row_height - kKelyoAddressRowGap,
++        std::max(0, width() - 2 * margin), row_height);
++  }
+ }
+ 
+ void ToolbarView::OnThemeChanged() {
+@@ -1771,6 +1826,13 @@ void ToolbarView::LayoutCommon() {
+       interior_margin.set_right(0);
+     }
+   }
++  // Kelyo: leave room under the buttons for the address bar's row.
++  if (IsInKelyoSidebar(this) && location_bar_view_) {
++    interior_margin.set_bottom(
++        interior_margin.bottom() +
++        location_bar_view_->GetPreferredSize().height() +
++        2 * kKelyoAddressRowGap);
++  }
+   layout_manager_->SetInteriorMargin(interior_margin);
+ 
+   // Extend buttons to the window edge if we're either in a maximized or
+diff --git a/chrome/browser/ui/views/toolbar/toolbar_view.h b/chrome/browser/ui/views/toolbar/toolbar_view.h
+index e10dc91a67..228cd94dc8 100644
+--- a/chrome/browser/ui/views/toolbar/toolbar_view.h
++++ b/chrome/browser/ui/views/toolbar/toolbar_view.h
+@@ -244,6 +244,7 @@ class ToolbarView : public views::AccessiblePaneView,
+       const views::SizeBounds& available_size) const override;
+   gfx::Size GetMinimumSize() const override;
+   void Layout(PassKey) override;
++  void AfterPropertyChange(const void* key, int64_t old_value) override;
+   void OnThemeChanged() override;
+   bool AcceleratorPressed(const ui::Accelerator& acc) override;
+   void ChildPreferredSizeChanged(views::View* child) override;

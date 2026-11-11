@@ -1,17 +1,29 @@
-# Kite
+# Kelyo Browser
 
-A fast, calm web browser for Linux, inspired by [Ardia](https://ardia.dev).
+*The web. On your terms.* Pronounced KEL-ee-oh.
 
-**Kite is now built on Chromium.** See [`chromium/README.md`](chromium/README.md)
-for what Kite changes and how to build it. That version has tabs in a sidebar,
-split view, uBlock Origin Lite built in, the Chrome Web Store, a first-run
-welcome with its own music, and Chrome's speed.
+Kelyo is a Chromium-based browser for Linux, inspired by [Ardia](https://ardia.dev),
+built on three promises:
 
-The rest of this README describes Kite's first version: a Rust shell around
-Chromium via CEF (in `crates/`). CEF can't run Chrome extensions alongside
-multiple tabs in one window, which is why Kite moved to Chromium itself.
+- **Privacy by default.** uBlock Origin Lite blocks ads and trackers from the
+  first page; there is no Google account sign-in, sync, or background AI.
+- **Intelligence by choice.** No AI model runs or downloads unless you turn it on.
+- **Freedom by design.** Your extensions from the Chrome Web Store, your sidebar,
+  your colours, your data.
 
-## What it does
+Tabs and the address bar live in a sidebar painted with your own gradient theme,
+and a first-run welcome plays its own music. See
+[`chromium/README.md`](chromium/README.md) for what Kelyo changes in Chromium and
+how to build it.
+
+## The first version (Rust and CEF)
+
+The rest of this README describes the project's first version, a Rust shell
+around Chromium via CEF (in `crates/`), from when it was called Kite. CEF can't
+run Chrome extensions alongside multiple tabs in one window, which is why the
+browser moved to Chromium itself.
+
+### What it does
 
 - Vertical tab sidebar: click to switch, `×` to close, `+ New Tab`
 - Address bar that tells URLs from searches (`example.com`, `localhost:3000`, `fedora tips`),

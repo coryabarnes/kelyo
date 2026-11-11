@@ -7,7 +7,7 @@ index 7e1709c674..0e10fc4299 100644
  // static
  void FirstRunService::RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
 -  registry->RegisterBooleanPref(prefs::kFirstRunFinished, false);
-+  // Kite opens its own welcome (chrome://kite-welcome, via first_run_tabs in
++  // Kelyo opens its own welcome (chrome://kelyo-welcome, via first_run_tabs in
 +  // initial_preferences) instead of Chrome's first-run screens.
 +  registry->RegisterBooleanPref(prefs::kFirstRunFinished, true);
  }
@@ -22,7 +22,7 @@ index 598e361a29..04befb2fbd 100644
        infobars::ContentInfoBarManager::FromWebContents(web_contents);
  
 -  if (!google_apis::HasAPIKeyConfigured()) {
-+  // Kite ships without Google API keys on purpose (no Google sign-in, sync or
++  // Kelyo ships without Google API keys on purpose (no Google sign-in, sync or
 +  // cloud features), so it never warns that they're missing.
 +  constexpr bool kWarnAboutMissingApiKeys = false;
 +  if (kWarnAboutMissingApiKeys && !google_apis::HasAPIKeyConfigured()) {

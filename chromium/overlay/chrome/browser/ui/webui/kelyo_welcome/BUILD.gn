@@ -1,0 +1,24 @@
+# Copyright 2026 Kelyo. Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+source_set("kelyo_welcome") {
+  sources = [
+    "kelyo_welcome_ui.cc",
+    "kelyo_welcome_ui.h",
+  ]
+  public_deps = [
+    "//chrome/common",
+    "//content/public/browser",
+  ]
+  deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/resources/kelyo_welcome:resources",
+    "//chrome/browser/themes",
+    "//components/prefs",
+    "//skia",
+    "//ui/base/mojom",
+    "//ui/gfx",
+    "//ui/webui",
+  ]
+}

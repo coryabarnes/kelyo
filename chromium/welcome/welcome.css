@@ -300,6 +300,35 @@ kbd {
   text-align: center;
 }
 
+/* "Make it yours" theme swatches. */
+
+.themes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin: 6px 0;
+}
+
+.theme {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.theme:hover {
+  transform: scale(1.06);
+}
+
+.theme[aria-pressed='true'] {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+
 /* Step dots and the music toggle. */
 
 .dots {
