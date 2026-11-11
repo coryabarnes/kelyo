@@ -58,7 +58,7 @@ gclient runhooks
 Apply Kelyo and build:
 
 ```bash
-~/src/kite/chromium/apply.sh ~/chromium/src
+~/src/kelyo/chromium/apply.sh ~/chromium/src
 cd ~/chromium/src
 mkdir -p out/Kelyo
 cat > out/Kelyo/args.gn <<'EOF'
@@ -83,7 +83,7 @@ autoninja -C out/Kelyo chrome
 Package and install:
 
 ```bash
-~/src/kite/chromium/package/pack-snap.sh ~/chromium/src/out/Kelyo
+~/src/kelyo/chromium/package/pack-snap.sh ~/chromium/src/out/Kelyo
 pkexec snap install --dangerous --classic kelyo_*.snap
 ```
 

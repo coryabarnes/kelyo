@@ -17,19 +17,29 @@
 
   <main>
     <section class="step active" id="step-hello" aria-labelledby="hello-title">
-      <svg class="kite" viewBox="0 0 120 200" aria-hidden="true">
+      <svg class="mark" viewBox="250 220 560 580" aria-hidden="true">
         <defs>
-          <linearGradient id="kite-fill" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#a5d8ff"/>
-            <stop offset="0.55" stop-color="#7c8cff"/>
-            <stop offset="1" stop-color="#c49bff"/>
+          <linearGradient id="mark-pillar" gradientUnits="userSpaceOnUse" x1="0" y1="262" x2="0" y2="762">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#d4caff"/>
           </linearGradient>
+          <linearGradient id="mark-ribbon" gradientUnits="userSpaceOnUse" x1="560" y1="270" x2="640" y2="760">
+            <stop offset="0" stop-color="#a9e6ff"/>
+            <stop offset="0.5" stop-color="#c9b4ff"/>
+            <stop offset="1" stop-color="#ffbca8"/>
+          </linearGradient>
+          <filter id="mark-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="26"/>
+          </filter>
         </defs>
-        <path d="M60 6 L104 52 L60 112 L16 52 Z" fill="url(#kite-fill)"/>
-        <path d="M60 6 L60 112 M16 52 L104 52" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-        <path class="string" d="M60 112 C52 132 70 148 60 166 C52 180 66 190 58 198"
-              fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M57 134 l6 4 l-6 4 Z M60 158 l6 4 l-6 4 Z" fill="#ffd38a" opacity=".9"/>
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <g opacity=".7" filter="url(#mark-glow)">
+            <path d="M370 312 V712" stroke="#c9bcff" stroke-width="104"/>
+            <path d="M716 300 C612 384 506 452 476 512 C506 572 612 640 724 724" stroke="#c6b2ff" stroke-width="88"/>
+          </g>
+          <path d="M370 312 V712" stroke="url(#mark-pillar)" stroke-width="104"/>
+          <path class="ribbon" d="M716 300 C612 384 506 452 476 512 C506 572 612 640 724 724" stroke="url(#mark-ribbon)" stroke-width="88"/>
+        </g>
       </svg>
       <h1 id="hello-title" class="wordmark">Kelyo</h1>
       <p class="lede">The web. On your terms.</p>

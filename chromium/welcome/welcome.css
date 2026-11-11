@@ -134,20 +134,20 @@ main {
   to { opacity: 1; transform: none; }
 }
 
-.kite {
-  width: 96px;
-  height: 160px;
-  filter: drop-shadow(0 10px 30px rgba(140, 150, 255, 0.45));
-  transform-origin: 50% 0;
+.mark {
+  width: 120px;
+  height: 124px;
+  overflow: visible;
 }
 
-.step.active .kite {
-  animation: rise 1.4s ease both, sway 7s ease-in-out 1.4s infinite;
+.step.active .mark {
+  animation: rise 1.4s ease both, float 8s ease-in-out 1.4s infinite;
 }
 
-@keyframes sway {
-  0%, 100% { transform: rotate(-4deg) translateY(0); }
-  50% { transform: rotate(5deg) translateY(-8px); }
+/* The K drifts and breathes, like light on a slow current. */
+@keyframes float {
+  0%, 100% { transform: translateY(0); filter: drop-shadow(0 8px 30px rgba(170, 160, 255, 0.35)); }
+  50% { transform: translateY(-10px); filter: drop-shadow(0 14px 44px rgba(190, 170, 255, 0.6)); }
 }
 
 .wordmark {
@@ -390,7 +390,7 @@ kbd {
 
 @media (prefers-reduced-motion: reduce) {
   .aurora,
-  .step.active .kite,
+  .step.active .mark,
   .step.active > * {
     animation: none;
   }
