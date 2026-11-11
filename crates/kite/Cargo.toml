@@ -1,0 +1,16 @@
+[package]
+name = "kite"
+description = "A fast, sidebar-first Chromium browser for Linux."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["sandbox"]
+# Chromium's process sandbox. On Linux it uses user namespaces, which Fedora enables.
+sandbox = ["cef/sandbox"]
+
+[dependencies]
+kite-core.workspace = true
+cef.workspace = true
