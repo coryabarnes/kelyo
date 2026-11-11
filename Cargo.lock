@@ -739,7 +739,7 @@ dependencies = [
 
 [[package]]
 name = "kite"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "cef",
  "kite-core",
@@ -748,7 +748,7 @@ dependencies = [
 
 [[package]]
 name = "kite-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "adblock",
  "rusqlite",
@@ -1618,7 +1618,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "cef",
 ]

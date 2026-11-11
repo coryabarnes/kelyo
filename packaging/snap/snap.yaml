@@ -1,5 +1,5 @@
 name: kite
-version: '0.2.0'
+version: '0.2.1'
 summary: A fast, sidebar-first Chromium browser for Linux
 description: |
   Kite embeds Chromium through CEF, with the whole browser shell

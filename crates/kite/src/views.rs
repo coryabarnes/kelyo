@@ -63,6 +63,19 @@ wrap_window_delegate! {
             }
         }
 
+        // The `cef` crate answers "no" to these unless asked (CEF's own default is yes).
+        fn can_resize(&self, _window: Option<&mut Window>) -> i32 {
+            1
+        }
+
+        fn can_maximize(&self, _window: Option<&mut Window>) -> i32 {
+            1
+        }
+
+        fn can_minimize(&self, _window: Option<&mut Window>) -> i32 {
+            1
+        }
+
         // Chrome style, holding Alloy style browser views (see `TabView`).
         // An Alloy window has no Chrome profile, and DevTools crashes looking
         // up its theme.
@@ -106,6 +119,19 @@ wrap_window_delegate! {
                 Some(host) => host.try_close_browser(),
                 None => 1,
             }
+        }
+
+        // The `cef` crate answers "no" to these unless asked (CEF's own default is yes).
+        fn can_resize(&self, _window: Option<&mut Window>) -> i32 {
+            1
+        }
+
+        fn can_maximize(&self, _window: Option<&mut Window>) -> i32 {
+            1
+        }
+
+        fn can_minimize(&self, _window: Option<&mut Window>) -> i32 {
+            1
         }
 
         fn window_runtime_style(&self) -> RuntimeStyle {
