@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b1747"/>
+      <stop offset="0.6" stop-color="#3a2a78"/>
+      <stop offset="1" stop-color="#b8707a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.15" r="0.7">
+      <stop offset="0" stop-color="#4ecdc4" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#4ecdc4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="kite" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#bfe3ff"/>
+      <stop offset="0.55" stop-color="#8a98ff"/>
+      <stop offset="1" stop-color="#d2a8ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#sky)"/>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#glow)"/>
+  <g transform="rotate(-8 128 120)">
+    <path d="M128 34 L184 94 L128 168 L72 94 Z" fill="url(#kite)"/>
+    <path d="M128 34 L128 168 M72 94 L184 94" stroke="#ffffff" stroke-opacity="0.6" stroke-width="4"/>
+    <path d="M128 168 C116 188 142 200 128 222" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M123 186 l10 6 l-10 6 Z" fill="#ffd38a"/>
+  </g>
+</svg>

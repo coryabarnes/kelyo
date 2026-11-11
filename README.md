@@ -1,12 +1,15 @@
 # Kite
 
-A fast, sidebar-first web browser for Linux: Chromium's engine, with the whole
-browser shell written in Rust.
+A fast, calm web browser for Linux, inspired by [Ardia](https://ardia.dev).
 
-Kite embeds Chromium through the [Chromium Embedded Framework](https://github.com/chromiumembedded/cef)
-using the [`cef`](https://crates.io/crates/cef) crate, so pages load and render
-exactly as fast as in Chrome. Everything around the page (the window, sidebar,
-tabs, address bar, split view and shortcuts) is Rust.
+**Kite is now built on Chromium.** See [`chromium/README.md`](chromium/README.md)
+for what Kite changes and how to build it. That version has tabs in a sidebar,
+split view, uBlock Origin Lite built in, the Chrome Web Store, a first-run
+welcome with its own music, and Chrome's speed.
+
+The rest of this README describes Kite's first version: a Rust shell around
+Chromium via CEF (in `crates/`). CEF can't run Chrome extensions alongside
+multiple tabs in one window, which is why Kite moved to Chromium itself.
 
 ## What it does
 

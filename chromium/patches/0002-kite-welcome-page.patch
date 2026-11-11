@@ -1,0 +1,85 @@
+diff -ruN a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
+--- a/chrome/browser/chrome_content_browser_client.cc	2026-11-11 10:08:08.831198134 -0600
++++ b/chrome/browser/chrome_content_browser_client.cc	2026-11-11 10:08:08.965721983 -0600
+@@ -1032,6 +1032,13 @@
+ #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+         // BUILDFLAG(IS_CHROMEOS)
+ 
++  // Kite's first-run welcome (chrome://kite-welcome) plays its welcome tune as
++  // soon as it opens. The host is spelled out to avoid depending on the WebUI.
++  if (web_contents->GetLastCommittedURL().SchemeIs(content::kChromeUIScheme) &&
++      web_contents->GetLastCommittedURL().host() == "kite-welcome") {
++    return blink::mojom::AutoplayPolicy::kNoUserGestureRequired;
++  }
++
+   // If we can show a setting to disable autoplay policy and are currently set
+   // to `kDocumentUserActivationRequired`, return the user preference.
+   if (base::FeatureList::IsEnabled(media::kAutoplayDisableSettings) &&
+diff -ruN a/chrome/browser/resources/BUILD.gn b/chrome/browser/resources/BUILD.gn
+--- a/chrome/browser/resources/BUILD.gn	2026-11-11 10:08:08.626995426 -0600
++++ b/chrome/browser/resources/BUILD.gn	2026-11-11 10:08:08.960144068 -0600
+@@ -23,6 +23,7 @@
+     "contextual_tasks:resources",
+     "glic:resources",
+     "glic/experimental_opt_in:resources",
++    "kite_welcome:resources",
+     "saved_tab_groups_unsupported:resources",
+     "segmentation_internals:resources",
+     "//components/enterprise/connectors/resources",
+diff -ruN a/chrome/browser/ui/webui/BUILD.gn b/chrome/browser/ui/webui/BUILD.gn
+--- a/chrome/browser/ui/webui/BUILD.gn	2026-11-11 10:08:08.740460834 -0600
++++ b/chrome/browser/ui/webui/BUILD.gn	2026-11-11 10:08:08.962725172 -0600
+@@ -83,6 +83,7 @@
+     "//chrome/browser/ui/webui/predictors",
+     "//chrome/browser/ui/webui/private_ai_internals",
+     "//chrome/browser/ui/webui/regional_capabilities_internals",
++    "//chrome/browser/ui/webui/kite_welcome",
+     "//chrome/browser/ui/webui/saved_tab_groups_unsupported",
+     "//chrome/browser/ui/webui/segmentation_internals",
+     "//chrome/browser/ui/webui/subresource_filter",
+diff -ruN a/chrome/browser/ui/webui/chrome_web_ui_configs.cc b/chrome/browser/ui/webui/chrome_web_ui_configs.cc
+--- a/chrome/browser/ui/webui/chrome_web_ui_configs.cc	2026-11-11 10:08:08.784860161 -0600
++++ b/chrome/browser/ui/webui/chrome_web_ui_configs.cc	2026-11-11 10:08:08.964328320 -0600
+@@ -50,6 +50,7 @@
+ #include "chrome/browser/ui/webui/policy/policy_ui.h"
+ #include "chrome/browser/ui/webui/predictors/predictors_ui.h"
+ #include "chrome/browser/ui/webui/regional_capabilities_internals/regional_capabilities_internals_ui.h"
++#include "chrome/browser/ui/webui/kite_welcome/kite_welcome_ui.h"
+ #include "chrome/browser/ui/webui/saved_tab_groups_unsupported/saved_tab_groups_unsupported_ui.h"
+ #include "chrome/browser/ui/webui/segmentation_internals/segmentation_internals_ui.h"
+ #include "chrome/browser/ui/webui/signin_internals_ui.h"
+@@ -321,6 +322,7 @@
+   map.AddWebUIConfig(
+       std::make_unique<
+           security_interstitials::KnownInterceptionDisclosureUIConfig>());
++  map.AddWebUIConfig(std::make_unique<KiteWelcomeUIConfig>());
+   map.AddWebUIConfig(std::make_unique<SavedTabGroupsUnsupportedUIConfig>());
+   map.AddWebUIConfig(std::make_unique<SegmentationInternalsUIConfig>());
+   map.AddWebUIConfig(std::make_unique<SignInInternalsUIConfig>());
+diff -ruN a/chrome/chrome_paks.gni b/chrome/chrome_paks.gni
+--- a/chrome/chrome_paks.gni	2026-11-11 10:08:08.692873325 -0600
++++ b/chrome/chrome_paks.gni	2026-11-11 10:08:08.960367389 -0600
+@@ -129,6 +129,7 @@
+       "$root_gen_dir/chrome/contextual_tasks_resources.pak",
+       "$root_gen_dir/chrome/glic_experimental_opt_in_resources.pak",
+       "$root_gen_dir/chrome/glic_resources.pak",
++      "$root_gen_dir/chrome/kite_welcome_resources.pak",
+       "$root_gen_dir/chrome/saved_tab_groups_unsupported_resources.pak",
+       "$root_gen_dir/components/autofill/core/browser/geo/autofill_address_rewriter_resources.pak",
+       "$root_gen_dir/components/autofill/core/browser/geo/autofill_alternative_state_name_map_resources.pak",
+diff -ruN a/tools/gritsettings/resource_ids.spec b/tools/gritsettings/resource_ids.spec
+--- a/tools/gritsettings/resource_ids.spec	2026-11-11 10:08:08.891921322 -0600
++++ b/tools/gritsettings/resource_ids.spec	2026-11-11 10:08:08.967023811 -0600
+@@ -1796,6 +1796,12 @@
+     "includes": [12000],
+   },
+ 
++  # Kite.
++  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/kite_welcome/resources.grd": {
++    "META": {"sizes": {"includes": [10]}},
++    "includes": [13000],
++  },
++
+   # END "everything else" section.
+   # Everything but chrome/, components/, content/, and ios/
+ 

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Welcome to Kite</title>
+  <link rel="stylesheet" href="welcome.css">
+  <script type="module" src="welcome.js"></script>
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+    <div class="aurora a3"></div>
+    <canvas id="stars"></canvas>
+    <div class="horizon"></div>
+  </div>
+
+  <main>
+    <section class="step active" id="step-hello" aria-labelledby="hello-title">
+      <svg class="kite" viewBox="0 0 120 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="kite-fill" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#a5d8ff"/>
+            <stop offset="0.55" stop-color="#7c8cff"/>
+            <stop offset="1" stop-color="#c49bff"/>
+          </linearGradient>
+        </defs>
+        <path d="M60 6 L104 52 L60 112 L16 52 Z" fill="url(#kite-fill)"/>
+        <path d="M60 6 L60 112 M16 52 L104 52" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+        <path class="string" d="M60 112 C52 132 70 148 60 166 C52 180 66 190 58 198"
+              fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M57 134 l6 4 l-6 4 Z M60 158 l6 4 l-6 4 Z" fill="#ffd38a" opacity=".9"/>
+      </svg>
+      <h1 id="hello-title" class="wordmark">Kite</h1>
+      <p class="lede">A calmer way through the web.</p>
+      <button class="primary" id="begin">Begin</button>
+    </section>
+
+    <section class="step" id="step-tour" aria-labelledby="tour-title">
+      <h2 id="tour-title">Light on its feet.</h2>
+      <ul class="cards">
+        <li>
+          <span class="icon" aria-hidden="true">◫</span>
+          <h3>Room to think</h3>
+          <p>Tabs live in the sidebar, and two pages can sit side by side.</p>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">🛡</span>
+          <h3>Ads stay out</h3>
+          <p>uBlock Origin Lite comes built in, so trackers and banners never load.</p>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">✦</span>
+          <h3>Your extensions come along</h3>
+          <p>It's Chromium inside, so the Chrome Web Store just works.</p>
+        </li>
+      </ul>
+      <button class="primary" data-next>Continue</button>
+    </section>
+
+    <section class="step" id="step-bring" aria-labelledby="bring-title">
+      <h2 id="bring-title">Bring your things.</h2>
+      <p class="lede">Bookmarks, history and passwords can move over from Chrome, Firefox and others.</p>
+      <div class="row">
+        <a class="secondary" href="chrome://settings/importData">Import from another browser</a>
+        <a class="secondary" href="https://chromewebstore.google.com/" target="_blank">Find extensions</a>
+      </div>
+      <button class="primary" data-next>Continue</button>
+    </section>
+
+    <section class="step" id="step-ready" aria-labelledby="ready-title">
+      <h2 id="ready-title">You're ready.</h2>
+      <dl class="keys">
+        <div><dt><kbd>Ctrl</kbd> <kbd>T</kbd></dt><dd>New tab</dd></div>
+        <div><dt><kbd>Ctrl</kbd> <kbd>L</kbd></dt><dd>Search or type an address</dd></div>
+        <div><dt><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>T</kbd></dt><dd>Bring back a closed tab</dd></div>
+      </dl>
+      <a class="primary" id="start" href="chrome://newtab/">Start browsing</a>
+    </section>
+  </main>
+
+  <nav class="dots" aria-label="Welcome steps">
+    <button class="dot active" aria-label="Hello" data-step="0"></button>
+    <button class="dot" aria-label="Tour" data-step="1"></button>
+    <button class="dot" aria-label="Bring your things" data-step="2"></button>
+    <button class="dot" aria-label="Ready" data-step="3"></button>
+  </nav>
+
+  <button class="sound" id="sound" aria-pressed="false" title="Music">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>
+      <path class="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"
+            fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </button>
+</body>
+</html>

@@ -1,0 +1,31 @@
+diff --git a/chrome/browser/ui/startup/first_run_service.cc b/chrome/browser/ui/startup/first_run_service.cc
+index 7e1709c674..0e10fc4299 100644
+--- a/chrome/browser/ui/startup/first_run_service.cc
++++ b/chrome/browser/ui/startup/first_run_service.cc
+@@ -80,7 +80,9 @@ bool IsFirstRunMarkedFinishedInPrefs() {
+ 
+ // static
+ void FirstRunService::RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
+-  registry->RegisterBooleanPref(prefs::kFirstRunFinished, false);
++  // Kite opens its own welcome (chrome://kite-welcome, via first_run_tabs in
++  // initial_preferences) instead of Chrome's first-run screens.
++  registry->RegisterBooleanPref(prefs::kFirstRunFinished, true);
+ }
+ 
+ FirstRunService::FirstRunService(Profile& profile,
+diff --git a/chrome/browser/ui/startup/infobar_utils.cc b/chrome/browser/ui/startup/infobar_utils.cc
+index 598e361a29..04befb2fbd 100644
+--- a/chrome/browser/ui/startup/infobar_utils.cc
++++ b/chrome/browser/ui/startup/infobar_utils.cc
+@@ -253,7 +253,10 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
+   infobars::ContentInfoBarManager* infobar_manager =
+       infobars::ContentInfoBarManager::FromWebContents(web_contents);
+ 
+-  if (!google_apis::HasAPIKeyConfigured()) {
++  // Kite ships without Google API keys on purpose (no Google sign-in, sync or
++  // cloud features), so it never warns that they're missing.
++  constexpr bool kWarnAboutMissingApiKeys = false;
++  if (kWarnAboutMissingApiKeys && !google_apis::HasAPIKeyConfigured()) {
+     if (infobars::IsInfoBarMigrated(
+             infobars::InfoBarDelegate::GOOGLE_API_KEYS_INFOBAR_DELEGATE)) {
+       if (auto* manager =

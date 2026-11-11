@@ -1,0 +1,31 @@
+diff --git a/chrome/browser/performance_manager/policies/memory_saver_mode_policy.cc b/chrome/browser/performance_manager/policies/memory_saver_mode_policy.cc
+index f121d12d95..17fa881d33 100644
+--- a/chrome/browser/performance_manager/policies/memory_saver_mode_policy.cc
++++ b/chrome/browser/performance_manager/policies/memory_saver_mode_policy.cc
+@@ -225,7 +225,8 @@ base::TimeDelta MemorySaverModePolicy::GetTimeBeforeDiscardForCurrentMode()
+     case MemorySaverModeAggressiveness::kMedium:
+       return base::Hours(4);
+     case MemorySaverModeAggressiveness::kAggressive:
+-      return base::Hours(2);
++      // Kite: tabs nap after half an hour in the background.
++      return base::Minutes(30);
+   }
+   NOTREACHED();
+ }
+diff --git a/components/performance_manager/user_tuning/prefs.cc b/components/performance_manager/user_tuning/prefs.cc
+index 8effd2c5e0..9eaa837266 100644
+--- a/components/performance_manager/user_tuning/prefs.cc
++++ b/components/performance_manager/user_tuning/prefs.cc
+@@ -32,10 +32,10 @@ void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
+       kMemorySaverModeTimeBeforeDiscardInMinutes,
+       kDefaultMemorySaverModeTimeBeforeDiscardInMinutes);
+   registry->RegisterIntegerPref(
+-      kMemorySaverModeState, static_cast<int>(MemorySaverModeState::kDisabled));
++      kMemorySaverModeState, static_cast<int>(MemorySaverModeState::kEnabled));
+   registry->RegisterIntegerPref(
+       kMemorySaverModeAggressiveness,
+-      static_cast<int>(MemorySaverModeAggressiveness::kMedium));
++      static_cast<int>(MemorySaverModeAggressiveness::kAggressive));
+   registry->RegisterIntegerPref(
+       kBatterySaverModeState,
+       static_cast<int>(BatterySaverModeState::kEnabledBelowThreshold));
