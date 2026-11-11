@@ -3,6 +3,8 @@
 pub const WINDOW_BG: u32 = 0xFF_16_16_1D;
 pub const SIDEBAR_BG: u32 = WINDOW_BG;
 pub const TAB_ACTIVE_BG: u32 = 0xFF_2A_2A_36;
+/// Tabs shown in split view, other than the active one.
+pub const TAB_SPLIT_BG: u32 = 0xFF_21_21_2B;
 pub const TEXT: u32 = 0xFF_E6_E6_EE;
 pub const TEXT_DIM: u32 = 0xFF_8C_8C_9A;
 

@@ -21,6 +21,7 @@ const KNOWN_SCHEMES: &[&str] = &[
     "chrome://",
     "data:",
     "view-source:",
+    "kite://",
 ];
 
 /// Classifies address bar input. Returns `None` for blank input.
@@ -145,6 +146,7 @@ mod tests {
         assert_eq!(classify("HTTP://Example.com"), url("HTTP://Example.com"));
         assert_eq!(classify("about:blank"), url("about:blank"));
         assert_eq!(classify("chrome://gpu"), url("chrome://gpu"));
+        assert_eq!(classify("kite://history"), url("kite://history"));
         assert_eq!(
             classify("file:///etc/fedora-release"),
             url("file:///etc/fedora-release")

@@ -1,0 +1,13 @@
+name: kite
+version: '0.2.0'
+summary: A fast, sidebar-first Chromium browser for Linux
+description: |
+  Kite embeds Chromium through CEF, with the whole browser shell
+  (window, vertical tab sidebar, address bar, split view) written in Rust.
+architectures: [amd64]
+base: core24
+confinement: classic
+grade: devel
+apps:
+  kite:
+    command: bin/kite-launcher

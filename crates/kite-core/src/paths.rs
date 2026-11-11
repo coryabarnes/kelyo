@@ -14,6 +14,16 @@ pub fn data_dir() -> Option<PathBuf> {
     data_dir_from(|key| std::env::var_os(key).filter(|value| !value.is_empty()))
 }
 
+/// The profile database: history, saved tabs and site settings.
+pub fn database() -> Option<PathBuf> {
+    data_dir().map(|dir| dir.join("kite.db"))
+}
+
+/// Where downloaded filter lists and the compiled ad blocker are cached.
+pub fn filters_dir() -> Option<PathBuf> {
+    data_dir().map(|dir| dir.join("filters"))
+}
+
 fn data_dir_from(env: impl Fn(&str) -> Option<std::ffi::OsString>) -> Option<PathBuf> {
     if let Some(xdg) = env("XDG_DATA_HOME") {
         return Some(PathBuf::from(xdg).join(APP_DIR));

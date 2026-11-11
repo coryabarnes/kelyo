@@ -7,3 +7,9 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+# Brave's filter engine. Without the default `single-thread` feature its
+# `Engine` is `Send + Sync`, so CEF's IO thread can check requests against it.
+adblock = { version = "0.13.5", default-features = false, features = ["embedded-domain-resolver", "full-regex-handling"] }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde_json = "1.0.154"
+url = "2.5.8"

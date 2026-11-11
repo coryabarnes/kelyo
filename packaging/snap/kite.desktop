@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Kite
+GenericName=Web Browser
+Comment=A fast, sidebar-first Chromium browser
+Exec=kite %U
+Icon=${SNAP}/meta/gui/kite.svg
+Terminal=false
+Categories=Network;WebBrowser;
+MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true

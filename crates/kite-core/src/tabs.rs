@@ -33,28 +33,48 @@ pub enum Placement {
     Background,
 }
 
-/// Two tabs shown side by side. `left` comes before `right` in the strip.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// The most panes split view shows at once.
+pub const MAX_PANES: usize = 3;
+
+/// How many closed tabs [`TabStrip::reopen_closed`] remembers.
+const CLOSED_HISTORY: usize = 25;
+
+/// Two or three tabs shown together, in pane order.
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Split {
-    pub left: TabId,
-    pub right: TabId,
+    panes: Vec<TabId>,
+    /// Stacked top to bottom instead of side by side.
+    pub vertical: bool,
 }
 
 impl Split {
     pub fn contains(&self, id: TabId) -> bool {
-        self.left == id || self.right == id
+        self.panes.contains(&id)
     }
+
+    pub fn panes(&self) -> &[TabId] {
+        &self.panes
+    }
+}
+
+/// A closed tab, kept so it can be reopened.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct ClosedTab {
+    url: String,
+    title: String,
+    index: usize,
 }
 
 /// Ordered tabs plus selection state.
 ///
 /// Invariants: `active` is `None` only when there are no tabs, and `split`,
-/// when set, names two distinct existing tabs, one of which is active.
+/// when set, names 2..=[`MAX_PANES`] distinct existing tabs, one of which is active.
 #[derive(Debug, Default)]
 pub struct TabStrip {
     tabs: Vec<Tab>,
     active: Option<TabId>,
     split: Option<Split>,
+    closed: Vec<ClosedTab>,
     next_id: u64,
 }
 
@@ -87,14 +107,18 @@ impl TabStrip {
         self.active
     }
 
-    pub fn split(&self) -> Option<Split> {
-        self.split
+    pub fn active_tab(&self) -> Option<&Tab> {
+        self.active.and_then(|id| self.get(id))
     }
 
-    /// The tabs currently on screen, in strip order.
+    pub fn split(&self) -> Option<&Split> {
+        self.split.as_ref()
+    }
+
+    /// The tabs currently on screen, in pane order.
     pub fn visible(&self) -> Vec<TabId> {
-        match (self.split, self.active) {
-            (Some(split), _) => vec![split.left, split.right],
+        match (&self.split, self.active) {
+            (Some(split), _) => split.panes.clone(),
             (None, Some(active)) => vec![active],
             (None, None) => Vec::new(),
         }
@@ -102,25 +126,27 @@ impl TabStrip {
 
     /// Opens a tab right after the active one.
     pub fn open(&mut self, url: impl Into<String>, placement: Placement) -> TabId {
-        let id = TabId(self.next_id);
-        self.next_id += 1;
-
         let index = self
             .active
             .and_then(|active| self.index_of(active))
             .map_or(self.tabs.len(), |i| i + 1);
+        self.open_at(index, url.into(), String::new(), placement)
+    }
+
+    fn open_at(&mut self, index: usize, url: String, title: String, placement: Placement) -> TabId {
+        let id = TabId(self.next_id);
+        self.next_id += 1;
         self.tabs.insert(
-            index,
+            index.min(self.tabs.len()),
             Tab {
                 id,
-                title: String::new(),
-                url: url.into(),
+                title,
+                url,
                 loading: false,
                 can_go_back: false,
                 can_go_forward: false,
             },
         );
-
         if placement == Placement::Foreground || self.active.is_none() {
             self.activate(id);
         }
@@ -132,30 +158,34 @@ impl TabStrip {
         if self.index_of(id).is_none() {
             return false;
         }
-        if self.split.is_some_and(|split| !split.contains(id)) {
+        if self.split.as_ref().is_some_and(|split| !split.contains(id)) {
             self.split = None;
         }
         self.active = Some(id);
         true
     }
 
-    /// Removes a tab. If it was active, its right neighbour (or else its left) becomes active.
+    /// Removes a tab. If it was active, another pane of the split becomes
+    /// active, or else its right neighbour (or else its left).
     pub fn close(&mut self, id: TabId) -> bool {
         let Some(index) = self.index_of(id) else {
             return false;
         };
-        self.tabs.remove(index);
+        let tab = self.tabs.remove(index);
+        self.closed.push(ClosedTab {
+            url: tab.url,
+            title: tab.title,
+            index,
+        });
+        if self.closed.len() > CLOSED_HISTORY {
+            self.closed.remove(0);
+        }
 
-        if let Some(split) = self.split.filter(|split| split.contains(id)) {
-            self.split = None;
+        if self.split.as_ref().is_some_and(|split| split.contains(id)) {
+            let remaining = self.remove_from_split(id);
             if self.active == Some(id) {
-                // Stay on the other half of the split.
-                let partner = if split.left == id {
-                    split.right
-                } else {
-                    split.left
-                };
-                self.active = Some(partner);
+                // Stay in what's left of the split.
+                self.active = remaining;
             }
         }
         if self.active == Some(id) {
@@ -163,6 +193,12 @@ impl TabStrip {
             self.active = self.tabs.get(neighbour).map(|tab| tab.id);
         }
         true
+    }
+
+    /// Reopens the most recently closed tab where it was, and activates it.
+    pub fn reopen_closed(&mut self) -> Option<TabId> {
+        let ClosedTab { url, title, index } = self.closed.pop()?;
+        Some(self.open_at(index, url, title, Placement::Foreground))
     }
 
     /// Activates the next (or previous) tab, wrapping around.
@@ -197,10 +233,78 @@ impl TabStrip {
         };
         let (left, right) = (index.min(partner), index.max(partner));
         self.split = Some(Split {
-            left: self.tabs[left].id,
-            right: self.tabs[right].id,
+            panes: vec![self.tabs[left].id, self.tabs[right].id],
+            vertical: false,
         });
         true
+    }
+
+    /// Adds `id` to split view as the last pane, starting split view with the
+    /// active tab if it's off. If `id` is already a pane, takes it out instead.
+    /// Returns whether anything changed.
+    pub fn split_with(&mut self, id: TabId) -> bool {
+        if self.index_of(id).is_none() {
+            return false;
+        }
+        let Some(active) = self.active else {
+            return false;
+        };
+        match &mut self.split {
+            Some(split) if split.contains(id) => {
+                let remaining = self.remove_from_split(id);
+                if self.active == Some(id) {
+                    self.active = remaining;
+                }
+                true
+            }
+            Some(split) if split.panes.len() < MAX_PANES => {
+                split.panes.push(id);
+                true
+            }
+            Some(_) => false,
+            None if id == active => false,
+            None => {
+                self.split = Some(Split {
+                    panes: vec![active, id],
+                    vertical: false,
+                });
+                true
+            }
+        }
+    }
+
+    /// Switches split view between side by side and stacked.
+    pub fn toggle_split_orientation(&mut self) {
+        if let Some(split) = &mut self.split {
+            split.vertical = !split.vertical;
+        }
+    }
+
+    /// Restores a saved split. Ignored unless it names 2..=[`MAX_PANES`]
+    /// distinct tabs including the active one.
+    pub fn set_split(&mut self, panes: Vec<TabId>, vertical: bool) {
+        let mut distinct = panes.clone();
+        distinct.sort();
+        distinct.dedup();
+        let valid = (2..=MAX_PANES).contains(&panes.len())
+            && distinct.len() == panes.len()
+            && panes.iter().all(|id| self.index_of(*id).is_some())
+            && self.active.is_some_and(|active| panes.contains(&active));
+        if valid {
+            self.split = Some(Split { panes, vertical });
+        }
+    }
+
+    /// Takes `id` out of the split, ending split view if fewer than two panes
+    /// remain. Returns the first remaining pane.
+    fn remove_from_split(&mut self, id: TabId) -> Option<TabId> {
+        let split = self.split.as_mut()?;
+        split.panes.retain(|pane| *pane != id);
+        let first = split.panes.first().copied();
+        if split.panes.len() < 2 {
+            self.split = None;
+        }
+        first
     }
 
     fn index_of(&self, id: TabId) -> Option<usize> {
@@ -318,6 +422,90 @@ mod tests {
         strip.activate(tabs[2]);
         assert_eq!(strip.split(), None);
         assert_eq!(strip.visible(), vec![tabs[2]]);
+    }
+
+    #[test]
+    fn split_with_adds_up_to_three_panes_and_toggles_membership() {
+        let (mut strip, tabs) = strip_with(4);
+        strip.activate(tabs[0]);
+        assert!(strip.split_with(tabs[2]));
+        assert_eq!(strip.visible(), vec![tabs[0], tabs[2]]);
+        assert!(strip.split_with(tabs[3]));
+        assert_eq!(strip.visible(), vec![tabs[0], tabs[2], tabs[3]]);
+        assert!(!strip.split_with(tabs[1]), "a fourth pane is refused");
+
+        assert!(strip.split_with(tabs[2]));
+        assert_eq!(strip.visible(), vec![tabs[0], tabs[3]]);
+        assert!(strip.split_with(tabs[3]));
+        assert_eq!(strip.split(), None, "one pane left ends split view");
+        assert_eq!(strip.active(), Some(tabs[0]));
+    }
+
+    #[test]
+    fn split_with_the_active_tab_alone_does_nothing() {
+        let (mut strip, tabs) = strip_with(2);
+        assert!(!strip.split_with(tabs[1]));
+        assert_eq!(strip.split(), None);
+    }
+
+    #[test]
+    fn removing_the_active_pane_activates_another_pane() {
+        let (mut strip, tabs) = strip_with(3);
+        strip.activate(tabs[0]);
+        strip.split_with(tabs[1]);
+        strip.split_with(tabs[2]);
+        strip.split_with(tabs[0]);
+        assert_eq!(strip.active(), Some(tabs[1]));
+        assert_eq!(strip.visible(), vec![tabs[1], tabs[2]]);
+    }
+
+    #[test]
+    fn orientation_toggles_only_while_split() {
+        let (mut strip, tabs) = strip_with(2);
+        strip.toggle_split_orientation();
+        assert_eq!(strip.split(), None);
+        strip.split_with(tabs[0]);
+        strip.toggle_split_orientation();
+        assert!(strip.split().unwrap().vertical);
+    }
+
+    #[test]
+    fn set_split_rejects_invalid_layouts() {
+        let (mut strip, tabs) = strip_with(4);
+        strip.set_split(vec![tabs[0], tabs[0]], false);
+        assert_eq!(strip.split(), None);
+        strip.set_split(vec![tabs[0], tabs[1]], false);
+        assert_eq!(strip.split(), None, "must include the active tab");
+        strip.set_split(tabs.clone(), false);
+        assert_eq!(strip.split(), None, "too many panes");
+        strip.set_split(vec![tabs[3], tabs[1]], true);
+        assert_eq!(strip.visible(), vec![tabs[3], tabs[1]]);
+    }
+
+    #[test]
+    fn closing_a_pane_of_three_keeps_the_split() {
+        let (mut strip, tabs) = strip_with(3);
+        strip.activate(tabs[0]);
+        strip.split_with(tabs[1]);
+        strip.split_with(tabs[2]);
+        strip.close(tabs[0]);
+        assert_eq!(strip.visible(), vec![tabs[1], tabs[2]]);
+        assert_eq!(strip.active(), Some(tabs[1]));
+    }
+
+    #[test]
+    fn reopens_closed_tabs_in_place_most_recent_first() {
+        let (mut strip, tabs) = strip_with(3);
+        strip.get_mut(tabs[1]).unwrap().title = "B".into();
+        strip.close(tabs[1]);
+        strip.close(tabs[2]);
+        let c = strip.reopen_closed().unwrap();
+        assert_eq!(strip.get(c).unwrap().url, "https://2.example");
+        let b = strip.reopen_closed().unwrap();
+        assert_eq!(strip.get(b).unwrap().title, "B");
+        assert_eq!(ids(&strip), vec![tabs[0], b, c]);
+        assert_eq!(strip.active(), Some(b));
+        assert_eq!(strip.reopen_closed(), None);
     }
 
     #[test]

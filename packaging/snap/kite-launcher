@@ -1,0 +1,4 @@
+#!/bin/sh
+# The binary has no rpath, so point the loader at the bundled libcef.so.
+export LD_LIBRARY_PATH="$SNAP/kite${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "$SNAP/kite/kite" "$@"

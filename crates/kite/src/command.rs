@@ -22,19 +22,31 @@ pub enum Command {
     },
     CloseTab(TabId),
     CloseActiveTab,
+    ReopenClosedTab,
     ActivateTab(TabId),
     CycleTabs {
         forward: bool,
     },
     ToggleSplit,
+    /// Add the tab to split view, or take it out if it's already there.
+    SplitWith(TabId),
+    ToggleSplitOrientation,
     /// Raw address bar input for the active tab.
     Navigate(String),
+    /// The user typed in the address bar; this is the text after the edit.
+    AddressBarEdited(String),
     FocusAddressBar,
     /// Put the active tab's URL back into the address bar (Escape).
     ResetAddressBar,
     Back,
     Forward,
     Reload,
+    ToggleDevTools,
+    /// Copy the active tab's URL, without tracking parameters.
+    CopyCleanLink,
+    OpenHistory,
+    /// Turn ad blocking off (or back on) for the active tab's site.
+    ToggleBlocking,
     CloseWindow,
 
     // Engine events.
@@ -42,7 +54,11 @@ pub enum Command {
         tab: TabId,
         browser: BrowserId,
     },
+    /// The page agreed to close (its unload handlers ran); drop its view.
+    BrowserReadyToClose(BrowserId),
     BrowserClosed(BrowserId),
+    /// A page got focus (e.g. a click into a split view pane).
+    BrowserFocused(BrowserId),
     TitleChanged {
         browser: BrowserId,
         title: String,
@@ -63,6 +79,12 @@ pub enum Command {
 pub fn dispatch(command: Command) {
     let mut task = RunCommand::new(Arc::new(Mutex::new(Some(command))));
     post_task(ThreadId::UI, Some(&mut task));
+}
+
+/// Queues `command` to run on the UI thread after `delay_ms` milliseconds.
+pub fn dispatch_after(command: Command, delay_ms: i64) {
+    let mut task = RunCommand::new(Arc::new(Mutex::new(Some(command))));
+    post_delayed_task(ThreadId::UI, Some(&mut task), delay_ms);
 }
 
 wrap_task! {

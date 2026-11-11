@@ -3,12 +3,17 @@
 //! ```text
 //! ┌──────────── root (horizontal) ─────────────────────────────┐
 //! │ sidebar (vertical, fixed width) │ content (horizontal)       │
-//! │  ‹ › ↻ ◫        nav row         │  web view [ | web view ]   │
+//! │  ‹ › ↻ ◫ 🛡      nav row         │  web view [ | web view ]   │
 //! │  [address bar              ]    │  (only the visible tabs    │
 //! │  tab rows (scrollable)          │   are shown; split view    │
-//! │  + New Tab                      │   shows two side by side)  │
+//! │  + New Tab                      │   shows up to three, side  │
+//! │                                 │   by side or stacked)      │
 //! └─────────────────────────────────┴────────────────────────────┘
 //! ```
+
+use std::cell::Cell;
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 
 use cef::*;
 use kite_core::TabId;
@@ -27,6 +32,9 @@ pub struct Ui {
     pub forward: LabelButton,
     pub reload: LabelButton,
     pub split: LabelButton,
+    /// Ad blocking for the current site: shows the blocked count, click to toggle.
+    pub shield: LabelButton,
+    content_vertical: Cell<bool>,
 }
 
 impl Ui {
@@ -53,13 +61,15 @@ impl Ui {
         let forward = button("›", Command::Forward, "Forward (Alt+Right)");
         let reload = button("↻", Command::Reload, "Reload (Ctrl+R)");
         let split = button("◫", Command::ToggleSplit, "Split view (Ctrl+Shift+S)");
-        for item in [&back, &forward, &reload, &split] {
+        let shield = button("🛡", Command::ToggleBlocking, "");
+        for item in [&back, &forward, &reload, &split, &shield] {
             add(&nav, item);
         }
         add(&sidebar, &nav);
 
-        let address_bar = textfield_create(Some(&mut AddressBar::new()))
-            .expect("CEF failed to create a textfield");
+        let address_bar =
+            textfield_create(Some(&mut AddressBar::new(Arc::new(AtomicBool::new(false)))))
+                .expect("CEF failed to create a textfield");
         address_bar.set_font_list(Some(&CefString::from(theme::FONT)));
         address_bar.set_placeholder_text(Some(&CefString::from("Search or enter address")));
         add(&sidebar, &address_bar);
@@ -85,19 +95,8 @@ impl Ui {
         new_tab.set_horizontal_alignment(HorizontalAlignment::LEFT);
         add(&sidebar, &new_tab);
 
-        // Content area. `default_flex` makes every web view share the width equally.
         let content = panel(None);
-        set_box_layout(
-            &content,
-            BoxLayoutSettings {
-                default_flex: 1,
-                ..box_settings(
-                    Axis::Horizontal,
-                    theme::CONTENT_PADDING,
-                    theme::CONTENT_PADDING,
-                )
-            },
-        );
+        set_content_layout(&content, Axis::Horizontal);
 
         add(&root, &sidebar);
         add(&root, &content);
@@ -112,6 +111,20 @@ impl Ui {
             forward,
             reload,
             split,
+            shield,
+            content_vertical: Cell::new(false),
+        }
+    }
+
+    /// Lays the visible web views out side by side, or stacked if `vertical`.
+    pub fn set_content_vertical(&self, vertical: bool) {
+        if self.content_vertical.replace(vertical) != vertical {
+            let axis = if vertical {
+                Axis::Vertical
+            } else {
+                Axis::Horizontal
+            };
+            set_content_layout(&self.content, axis);
         }
     }
 
@@ -139,18 +152,24 @@ impl TabRow {
             theme::TAB_LIST_WIDTH,
             theme::TAB_ROW_HEIGHT,
         )));
-        let layout = set_box_layout(&panel, box_settings(Axis::Horizontal, 2, 2));
+        let layout = set_box_layout(&panel, box_settings(Axis::Horizontal, 0, 0));
 
         let title = button("New Tab", Command::ActivateTab(tab), "");
         title.set_horizontal_alignment(HorizontalAlignment::LEFT);
+        let split = button(
+            "◫",
+            Command::SplitWith(tab),
+            "Show beside the current tab (up to 3)",
+        );
         let close = button("×", Command::CloseTab(tab), "Close tab (Ctrl+W)");
 
         add(&panel, &title);
+        add(&panel, &split);
         add(&panel, &close);
         layout.set_flex_for_view(Some(&mut View::from(&title)), 1);
 
         let row = Self { panel, title };
-        row.set_active(false);
+        row.set_state(RowState::Normal);
         row
     }
 
@@ -160,14 +179,22 @@ impl TabRow {
         self.title.set_tooltip_text(Some(&text));
     }
 
-    pub fn set_active(&self, active: bool) {
-        let color = if active {
-            theme::TAB_ACTIVE_BG
-        } else {
-            theme::SIDEBAR_BG
+    pub fn set_state(&self, state: RowState) {
+        let color = match state {
+            RowState::Active => theme::TAB_ACTIVE_BG,
+            RowState::InSplit => theme::TAB_SPLIT_BG,
+            RowState::Normal => theme::SIDEBAR_BG,
         };
         self.panel.set_background_color(color);
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RowState {
+    Active,
+    /// On screen in split view, but not the active pane.
+    InSplit,
+    Normal,
 }
 
 // Small constructors that keep the layout code above readable.
@@ -190,6 +217,17 @@ fn box_settings(axis: Axis, padding: i32, spacing: i32) -> BoxLayoutSettings {
         cross_axis_alignment: AxisAlignment::STRETCH,
         ..Default::default()
     }
+}
+
+/// `default_flex` makes every web view share the space equally.
+fn set_content_layout(content: &Panel, axis: Axis) {
+    set_box_layout(
+        content,
+        BoxLayoutSettings {
+            default_flex: 1,
+            ..box_settings(axis, theme::CONTENT_PADDING, theme::CONTENT_PADDING)
+        },
+    );
 }
 
 fn panel(delegate: Option<PanelDelegate>) -> Panel {

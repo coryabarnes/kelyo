@@ -2,6 +2,8 @@
 //! layout question or turns an event into a [`Command`].
 
 use std::cell::RefCell;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use cef::*;
 use kite_core::TabId;
@@ -61,8 +63,11 @@ wrap_window_delegate! {
             }
         }
 
+        // Chrome style, holding Alloy style browser views (see `TabView`).
+        // An Alloy window has no Chrome profile, and DevTools crashes looking
+        // up its theme.
         fn window_runtime_style(&self) -> RuntimeStyle {
-            RuntimeStyle::DEFAULT
+            RuntimeStyle::CHROME
         }
     }
 }
@@ -104,7 +109,7 @@ wrap_window_delegate! {
         }
 
         fn window_runtime_style(&self) -> RuntimeStyle {
-            RuntimeStyle::DEFAULT
+            RuntimeStyle::CHROME
         }
     }
 }
@@ -115,11 +120,19 @@ wrap_browser_view_delegate! {
         tab: TabId,
     }
 
-    impl ViewDelegate {}
+    impl ViewDelegate {
+        // Box layouts share out only the space left after preferred sizes, so
+        // a token size makes split view panes equal.
+        fn preferred_size(&self, _view: Option<&mut View>) -> Size {
+            Size { width: 1, height: 1 }
+        }
+    }
 
     impl BrowserViewDelegate {
         fn on_browser_created(&self, _view: Option<&mut BrowserView>, browser: Option<&mut Browser>) {
             if let Some(browser) = browser {
+                // Right away, not via a command: `do_close` may need it first.
+                shell::set_tab_browser(browser.identifier(), true);
                 dispatch(Command::BrowserCreated { tab: self.tab, browser: browser.identifier() });
             }
         }
@@ -135,15 +148,21 @@ wrap_browser_view_delegate! {
             1
         }
 
+        // Chrome style allows one browser view per window ("Cannot add
+        // multiple Chrome style BrowserViews"); Alloy allows any number.
         fn browser_runtime_style(&self) -> RuntimeStyle {
-            RuntimeStyle::DEFAULT
+            RuntimeStyle::ALLOY
         }
     }
 }
 
 wrap_textfield_delegate! {
-    // The address bar: Enter navigates, Escape restores the current URL.
-    pub struct AddressBar;
+    // The address bar: Enter navigates, Escape restores the current URL, and
+    // typing completes from history.
+    pub struct AddressBar {
+        // Set while the last key deleted text, so completion doesn't put it straight back.
+        deleting: Arc<AtomicBool>,
+    }
 
     impl ViewDelegate {}
 
@@ -153,7 +172,9 @@ wrap_textfield_delegate! {
             if event.type_ != KeyEventType::RAWKEYDOWN {
                 return 0;
             }
-            match event.windows_key_code {
+            let code = event.windows_key_code;
+            self.deleting.store(code == key::BACK || code == key::DELETE, Ordering::Relaxed);
+            match code {
                 key::RETURN => {
                     let input = CefString::from(&textfield.text()).to_string();
                     dispatch(Command::Navigate(input));
@@ -164,6 +185,13 @@ wrap_textfield_delegate! {
                     1
                 }
                 _ => 0,
+            }
+        }
+
+        fn on_after_user_action(&self, textfield: Option<&mut Textfield>) {
+            let Some(textfield) = textfield else { return };
+            if !self.deleting.load(Ordering::Relaxed) {
+                dispatch(Command::AddressBarEdited(CefString::from(&textfield.text()).to_string()));
             }
         }
     }
