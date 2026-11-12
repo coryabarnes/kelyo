@@ -9,6 +9,8 @@ import("//tools/grit/grit_rule.gni")
 import("//ui/webui/resources/tools/generate_grd.gni")
 
 files = [
+  "kelyo-mark.png",
+  "kelyo-wordmark.png",
   "music.js",
   "theme.css",
   "theme.html",

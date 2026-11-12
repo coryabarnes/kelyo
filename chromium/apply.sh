@@ -41,7 +41,7 @@ magick "$logo" -resize 32x32 chrome/app/theme/chromium/linux/product_logo_32.xpm
 
 echo "New files (overlay/, and the welcome page)"
 cp -r "$here/overlay/." .
-cp "$here"/welcome/*.html "$here"/welcome/*.css "$here"/welcome/*.js \
+cp "$here"/welcome/*.html "$here"/welcome/*.css "$here"/welcome/*.js "$here"/welcome/*.png \
    chrome/browser/resources/kelyo_welcome/
 
 echo "Code changes"

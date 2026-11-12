@@ -48,7 +48,7 @@ exec "$SNAP/kelyo/chrome" --class=kelyo \
 EOF
 chmod 755 "$root/bin/kelyo"
 
-cp "$here/../branding/kelyo-icon.svg" "$root/meta/gui/kelyo.svg"
+cp "$here/../branding/kelyo-icon.png" "$root/meta/gui/kelyo.png"
 cat > "$root/meta/gui/kelyo.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
@@ -56,7 +56,7 @@ Name=Kelyo
 GenericName=Web Browser
 Comment=The web. On your terms.
 Exec=kelyo %U
-Icon=${SNAP}/meta/gui/kelyo.svg
+Icon=${SNAP}/meta/gui/kelyo.png
 Terminal=false
 Categories=Network;WebBrowser;
 MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;

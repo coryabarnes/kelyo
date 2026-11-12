@@ -135,31 +135,28 @@ main {
 }
 
 .mark {
-  width: 120px;
-  height: 124px;
-  overflow: visible;
+  width: 168px;
+  height: auto;
 }
 
 .step.active .mark {
   animation: rise 1.4s ease both, float 8s ease-in-out 1.4s infinite;
 }
 
-/* The K drifts and breathes, like light on a slow current. */
+/* The ribbon drifts and breathes, like light on a slow current. */
 @keyframes float {
-  0%, 100% { transform: translateY(0); filter: drop-shadow(0 8px 30px rgba(170, 160, 255, 0.35)); }
-  50% { transform: translateY(-10px); filter: drop-shadow(0 14px 44px rgba(190, 170, 255, 0.6)); }
+  0%, 100% { transform: translateY(0); filter: drop-shadow(0 8px 30px rgba(80, 220, 255, 0.25)); }
+  50% { transform: translateY(-10px); filter: drop-shadow(0 14px 44px rgba(140, 120, 255, 0.45)); }
 }
 
 .wordmark {
   margin: 0;
-  font-size: clamp(56px, 10vw, 112px);
-  font-weight: 250;
-  letter-spacing: 0.18em;
-  margin-right: -0.18em;
-  background: linear-gradient(90deg, #dfe7ff, #ffffff 40%, #f6d9ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  line-height: 0;
+}
+
+.wordmark img {
+  width: clamp(200px, 26vw, 300px);
+  height: auto;
 }
 
 h2 {
