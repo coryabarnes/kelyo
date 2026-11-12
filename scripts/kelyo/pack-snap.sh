@@ -37,7 +37,7 @@ DESKTOP
 cat > "$root/meta/snap.yaml" <<YAML
 name: kelyo
 version: '$version'
-summary: Kelyo Browser. The web. On your terms.
+summary: Kelyo Browser (alpha). The web. On your terms.
 description: |
   Kelyo Browser: privacy by default, intelligence by choice, freedom by
   design. Built from Ardia (github.com/ardia-browser/ardia), GPL-3.0;
