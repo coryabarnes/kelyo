@@ -1,3 +1,14 @@
+# Kelyo Browser (alpha)
+
+> [!WARNING]
+> **Kelyo is alpha software.** It is an early, personal project under active development: expect bugs, missing
+> features, rough edges and breaking changes between versions. It is not ready for everyday use, and nothing here
+> is a finished product. Try it for fun, and please report problems rather than relying on it.
+
+This branch is Kelyo, built from Ardia. See [KELYO.md](KELYO.md) for what Kelyo changes; Ardia's original README follows.
+
+---
+
 <p align="center">
   <img src="apps/site/src/assets/app-icon.png" width="128" height="128" alt="Ardia's app icon">
 </p>

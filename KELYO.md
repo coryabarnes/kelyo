@@ -1,5 +1,10 @@
 # Kelyo Browser
 
+> [!WARNING]
+> **Kelyo is alpha software.** It is an early, personal project under active development: expect bugs, missing
+> features, rough edges and breaking changes between versions. It is not ready for everyday use, and nothing here
+> is a finished product. Try it for fun, and please report problems rather than relying on it.
+
 The web. On your terms. Privacy by default. Intelligence by choice. Freedom by design.
 
 Kelyo is built from [Ardia](https://github.com/ardia-browser/ardia) and its Linux port
