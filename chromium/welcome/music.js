@@ -73,8 +73,15 @@ export class WelcomeTune {
     if (!this.context) {
       this.build();
     }
-    await this.context.resume();
+    // resume() can stay pending while the browser still blocks autoplay, so
+    // give up after a moment; the next attempt starts from a fresh context.
+    await Promise.race([
+      this.context.resume(),
+      new Promise(resolve => setTimeout(resolve, 400)),
+    ]);
     if (this.context.state !== 'running') {
+      this.context.close();
+      this.context = null;
       return false;
     }
     if (!this.playing) {

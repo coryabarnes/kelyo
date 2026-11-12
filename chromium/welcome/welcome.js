@@ -33,9 +33,19 @@ async function startMusic() {
   setSound(await tune.start());
 }
 
-// Try to start right away. If the browser wants a click first, the first
-// click or key press anywhere starts it.
-startMusic();
+// Try to start right away, and keep trying for a few seconds: on first run
+// the browser may grant this page autoplay a moment after it loads. If it
+// wants a click instead, the first click or key press anywhere starts it.
+async function startMusicWhenAllowed(attempts = 12) {
+  for (let i = 0; i < attempts && wantsMusic; i++) {
+    await startMusic();
+    if (sound.getAttribute('aria-pressed') === 'true') {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+}
+startMusicWhenAllowed();
 for (const event of ['pointerdown', 'keydown']) {
   window.addEventListener(event, startMusic, {once: true});
 }
