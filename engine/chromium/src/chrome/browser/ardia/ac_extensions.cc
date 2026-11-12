@@ -362,7 +362,7 @@ AC_PROFILE_CALL(ac_extensions_install) {
                                    extensions::UNINSTALL_REASON_INTERNAL_MANAGEMENT,
                                    &ignored);
           return reply.Error(
-              "Ardia Scripts: Scripts/extension changed while it was "
+              "Kelyo Scripts: Scripts/extension changed while it was "
               "installing");
         }
         ardia::LiftPolicyBlockIfAllowed(profile.get(), id);

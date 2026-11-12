@@ -5,12 +5,12 @@
    // versions can set themselves as the default without interfering with
    // non-official, packaged versions using the built-in value.
 -  std::optional<std::string> name = env->GetVar("CHROME_DESKTOP");
-+  std::optional<std::string> name = env->GetVar("ARDIA_DESKTOP");
++  std::optional<std::string> name = env->GetVar("KELYO_DESKTOP");
    if (name.has_value() && !name.value().empty()) {
      return name.value();
    }
 -  return "chromium-browser.desktop";
-+  return "ardia.desktop";
++  return "kelyo.desktop";
  #endif
  }
  #endif  // BUILDFLAG(IS_LINUX)
@@ -21,7 +21,7 @@
    base::FilePath config_dir;
    std::optional<std::string> chrome_config_home_str =
 -      env->GetVar("CHROME_CONFIG_HOME");
-+      env->GetVar("ARDIA_CONFIG_HOME");
++      env->GetVar("KELYO_CONFIG_HOME");
    if (chrome_config_home_str.has_value() &&
        base::IsStringUTF8(chrome_config_home_str.value())) {
      config_dir = base::FilePath::FromUTF8Unsafe(chrome_config_home_str.value());
@@ -30,7 +30,7 @@
    std::string data_dir_basename = "google-chrome";
  #else
 -  std::string data_dir_basename = "chromium";
-+  std::string data_dir_basename = "ardia";
++  std::string data_dir_basename = "kelyo-browser";
  #endif
    *result = config_dir.Append(data_dir_basename + GetChannelSuffixForDataDir());
    return true;
@@ -41,7 +41,7 @@
    return "google-chrome";
  #else  // BUILDFLAG(CHROMIUM_BRANDING)
 -  return "chromium-browser";
-+  return "ardia";
++  return "kelyo";
  #endif
  }
  
@@ -53,8 +53,8 @@
  #else
 -constexpr char kBrowserDisplayName[] = "chromium-browser";
 -#define PRODUCT_STRING "Chromium"
-+constexpr char kBrowserDisplayName[] = "ardia";
-+#define PRODUCT_STRING "Ardia"
++constexpr char kBrowserDisplayName[] = "kelyo";
++#define PRODUCT_STRING "Kelyo"
  #endif
  
  #if defined(DLOPEN_PULSEAUDIO)

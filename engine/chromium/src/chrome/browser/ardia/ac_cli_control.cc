@@ -110,7 +110,7 @@ std::string WriteControlFile(const base::FilePath& path,
                              const std::string& contents,
                              uint64_t generation) {
   if (path.empty()) {
-    return "Ardia has no data folder.";
+    return "Kelyo has no data folder.";
   }
   const base::FilePath temp = path.DirName().Append(
       "." + path.BaseName().value() + "." +

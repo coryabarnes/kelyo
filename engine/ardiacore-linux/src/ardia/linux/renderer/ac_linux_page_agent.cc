@@ -54,7 +54,7 @@ void ConfigureArdiaPageWorld() {
   blink::WebIsolatedWorldInfo info;
   info.security_origin = blink::WebSecurityOrigin(url::Origin());
   info.content_security_policy = blink::WebString::FromUtf8(kArdiaPageWorldPolicy);
-  info.human_readable_name = blink::WebString::FromUtf8("Ardia");
+  info.human_readable_name = blink::WebString::FromUtf8("Kelyo");
   blink::SetIsolatedWorldInfo(ISOLATED_WORLD_ID_ARDIA_PAGE, info);
 }
 

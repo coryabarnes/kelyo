@@ -25,7 +25,7 @@ class KeyStore {
 };
 
 inline constexpr char kSecretSchema[] = "dev.ardia.linux.SyncKey";
-inline constexpr char kSecretLabel[] = "Ardia Sync Key";
+inline constexpr char kSecretLabel[] = "Kelyo Sync Key";
 inline constexpr char kSecretLibrary[] = "libsecret-1.so.0";
 inline constexpr char kProbeAccount[] = "aaaaaaaaaaaaaaaaaaaaaaaaaa";
 

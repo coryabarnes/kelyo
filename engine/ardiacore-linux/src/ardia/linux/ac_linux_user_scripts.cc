@@ -102,7 +102,7 @@ base::Value FolderValue(const store::Folder& folder) {
     return base::Value(base::DictValue()
                            .Set("state", "invalid")
                            .Set("generation", GenerationValue(folder.generation.value_or(0)))
-                           .Set("error", "Ardia's data folder path isn't UTF-8")
+                           .Set("error", "Kelyo's data folder path isn't UTF-8")
                            .Set("token", folder.token));
   }
   base::DictValue value;
@@ -314,7 +314,7 @@ void LinuxUserScriptsInvoke(const LinuxUserScriptsCaller& caller, std::string_vi
                             base::OnceCallback<void(bool, base::Value)> done) {
   CHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
   UserScriptsService& service = UserScriptsService::Get();
-  if (!service.ready()) return std::move(done).Run(false, base::Value("Ardia has no data folder"));
+  if (!service.ready()) return std::move(done).Run(false, base::Value("Kelyo has no data folder"));
   if (!caller.eligible) {
     return std::move(done).Run(false, base::Value("Userscripts are applied from a regular browser window"));
   }

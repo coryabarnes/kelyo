@@ -582,12 +582,12 @@ ClipboardWrite PhraseClipboard(std::string words) {
 }
 
 std::string KitText(const std::vector<std::string>& words, std::string_view created, std::string_view device) {
-  std::string out = "Ardia Recovery Kit\nCreated ";
+  std::string out = "Kelyo Recovery Kit\nCreated ";
   out.append(created).append(" on ").append(device).append("\n\n");
   out.append(
       "If you don’t have access to the device on which you first turned on sync, you can still get your synced data on "
       "another device:\n\n");
-  out.append("1. Open Ardia › Settings › Sync, and choose the same sync folder.\n");
+  out.append("1. Open Kelyo › Settings › Sync, and choose the same sync folder.\n");
   out.append("2. Click Enter Recovery Phrase.\n");
   out.append("3. Paste the 24 words below.\n\nRecovery phrase:\n\n");
   for (size_t i = 0; i < words.size(); ++i) {
@@ -597,7 +597,7 @@ std::string KitText(const std::vector<std::string>& words, std::string_view crea
   }
   out.append(
       "\nKeep this kit somewhere safe, like a password manager or a printed copy. Anyone with these words and your sync "
-      "folder can read your synced data. Ardia can’t recover the words for you: there’s no server and no other copy.\n");
+      "folder can read your synced data. Kelyo can’t recover the words for you: there’s no server and no other copy.\n");
   return out;
 }
 
@@ -641,7 +641,7 @@ std::string HostDeviceName() {
 std::string DefaultFolder(std::string_view home) {
   std::string base = home.empty() ? "/" : std::string(home);
   if (base.back() != '/') base.push_back('/');
-  return base + "Ardia Sync";
+  return base + "Kelyo Sync";
 }
 
 }

@@ -2690,7 +2690,7 @@ bool ShellHostView::Trusted(content::WebUI* ui) const {
 }
 
 base::DictValue ShellHostView::Bootstrap() const {
-  base::DictValue info = base::DictValue().Set("appName", "Ardia")
+  base::DictValue info = base::DictValue().Set("appName", "Kelyo")
       .Set("appVersion", ardiacore::LinuxAppVersion())
       .Set("appBuild", "linux-host")
       .Set("bundleId", "dev.ardia.linux")
@@ -2999,7 +2999,7 @@ void ShellHostView::OnKeyEvent(ui::KeyEvent* event) {
   const ui::Accelerator accelerator = KeyAccelerator(*event);
   if (base::CommandLine::ForCurrentProcess()->HasSwitch("ardia-keyboard-diagnostics") &&
       (event->IsControlDown() || shortcuts_.contains(accelerator))) {
-    LOG(INFO) << "Ardia key window=" << window_id_
+    LOG(INFO) << "Kelyo key window=" << window_id_
               << " key=" << event->key_code() << " code=" << static_cast<int>(event->code())
               << " flags=" << event->flags()
               << " view=" << static_cast<bool>(focus_manager_->GetFocusedView())
@@ -5024,7 +5024,7 @@ void ShellHostView::TabCommand(
                           bool refused, std::optional<std::string> result) {
           if (refused) {
             return std::move(done).Run(false, base::Value(base::DictValue()
-                .Set("code", "ERR_PAGE_EVALUATION_REFUSED").Set("message", "Ardia runs only its own page operations")));
+                .Set("code", "ERR_PAGE_EVALUATION_REFUSED").Set("message", "Kelyo runs only its own page operations")));
           }
           std::move(done).Run(true, result && request.Valid() ? base::Value(std::move(*result)) : base::Value());
         }, std::move(*request), std::move(done)));
@@ -6907,7 +6907,7 @@ class HostRegistry : public BrowserCollectionObserver,
       if (!app_profile || app_profile->GetPath() != profile_path_ ||
           !(utility ? browser->GetProfile() == app_profile
                     : ardiacore::LinuxProfileHosts(requested->second.page_profile, browser->GetProfile()))) {
-        LOG(WARNING) << "Ardia Linux host refused a window whose profile no longer matches its request";
+        LOG(WARNING) << "Kelyo Linux host refused a window whose profile no longer matches its request";
         return RefuseRequestedWindow(browser.get(), requested);
       }
     } else {
@@ -6921,7 +6921,7 @@ class HostRegistry : public BrowserCollectionObserver,
     }
     BrowserView* view = BrowserView::GetBrowserViewForBrowser(browser.get());
     if (!view || !view->GetWidget()) {
-      LOG(WARNING) << "Ardia Linux host could not attach to a Chrome BrowserView";
+      LOG(WARNING) << "Kelyo Linux host could not attach to a Chrome BrowserView";
       return;
     }
     auto overlay = std::make_unique<ShellHostView>(browser.get(), view, startup, app_profile);
@@ -7102,7 +7102,7 @@ void StartLinuxHost() {
     for (const auto& [id, host] : Hosts()) {
       if (host->OpenPrivateLink(contents, url)) return true;
     }
-    LOG(WARNING) << "[ardia] off-the-record link refused: the window's active tab has no live Ardia page";
+    LOG(WARNING) << "[ardia] off-the-record link refused: the window's active tab has no live Kelyo page";
     return true;
   };
   g_ardia_linux_devtools_opened_tab = [](content::WebContents* inspected, content::WebContents* opened, const GURL& url) {
@@ -7114,12 +7114,12 @@ void StartLinuxHost() {
       if (host->BindsTab(opened)) return;
     }
     if (ShellHostView* host = DevToolsLinkWindow(opened->GetBrowserContext(), opened)) return host->AdoptDevToolsTab(opened, url);
-    LOG(WARNING) << "[ardia] DevTools link refused: no Ardia window of its profile can show it";
+    LOG(WARNING) << "[ardia] DevTools link refused: no Kelyo window of its profile can show it";
     CloseDevToolsTab(opened);
   };
   g_ardia_linux_devtools_open_url = [](Profile* profile, const GURL& url) {
     if (ShellHostView* host = DevToolsLinkWindow(profile, nullptr)) return host->OpenDevToolsLink(profile, url);
-    LOG(WARNING) << "[ardia] DevTools link refused: no Ardia window of its profile can show it";
+    LOG(WARNING) << "[ardia] DevTools link refused: no Kelyo window of its profile can show it";
   };
   ardiacore::InstallLinuxAutoplayPolicy();
   ardiacore::InstallLinuxWebStore(

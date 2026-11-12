@@ -56,7 +56,7 @@ constexpr size_t kMaxRendererIdBytes = 64;
 constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
     net::DefineNetworkTrafficAnnotation("ardia_linux_live_folders", R"(
       semantics {
-        sender: "Ardia Live Folders"
+        sender: "Kelyo Live Folders"
         description:
           "Connects a Live Folder to GitHub, Bitbucket, Notion, Confluence or "
           "Google Drive and refreshes its pull requests or documents."

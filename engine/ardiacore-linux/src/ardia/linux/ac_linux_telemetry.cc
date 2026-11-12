@@ -33,10 +33,10 @@ namespace policy = ardia::linux_telemetry_policy;
 constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
     net::DefineNetworkTrafficAnnotation("ardia_linux_usage_telemetry", R"(
       semantics {
-        sender: "Ardia usage telemetry"
+        sender: "Kelyo usage telemetry"
         description:
-          "Sends anonymous usage telemetry from this Ardia build to the "
-          "Ardia project: feature use counts, timings, enums and flags, "
+          "Sends anonymous usage telemetry from this Kelyo build to the "
+          "Kelyo project: feature use counts, timings, enums and flags, "
           "batched as OpenTelemetry logs."
         trigger:
           "The browser's telemetry client flushing its queue of usage "
@@ -49,7 +49,7 @@ constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
           "id and the app version. No URLs, page content, titles or free "
           "text, and no cookies or credentials."
         destination: OTHER
-        destination_other: "The Ardia telemetry collector at ardia.dev."
+        destination_other: "The Kelyo telemetry collector at ardia.dev."
         last_reviewed: "2026-11-10"
       }
       policy {

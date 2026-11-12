@@ -199,7 +199,7 @@ std::optional<std::string> Unhex(std::string_view text) {
 
 Outcome KeyringFailure(KeyStatus status) {
   if (status == KeyStatus::kLocked)
-    return Outcome::Error(kErrKeyringLocked, "Unlock your keyring so Ardia can use this service");
+    return Outcome::Error(kErrKeyringLocked, "Unlock your keyring so Kelyo can use this service");
   return Outcome::Error(kErrKeyringUnavailable, "No keyring is available to keep this service's token");
 }
 

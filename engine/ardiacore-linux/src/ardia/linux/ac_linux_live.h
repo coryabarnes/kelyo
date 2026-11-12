@@ -29,8 +29,8 @@ inline constexpr const char* kMethods[] = {"ArdiaLive.request", "ArdiaLive.conne
                                            "ArdiaLive.disconnect"};
 
 inline constexpr char kSecretSchema[] = "dev.ardia.linux.LiveToken";
-inline constexpr char kSecretLabel[] = "Ardia Live Folder Token";
-inline constexpr char kKeyDirectory[] = "Ardia Live Tokens";
+inline constexpr char kSecretLabel[] = "Kelyo Live Folder Token";
+inline constexpr char kKeyDirectory[] = "Kelyo Live Tokens";
 inline constexpr char kGoogleRedirect[] = "http://127.0.0.1:53682/ardia-oauth";
 inline constexpr char kNotionVersion[] = "2022-06-28";
 

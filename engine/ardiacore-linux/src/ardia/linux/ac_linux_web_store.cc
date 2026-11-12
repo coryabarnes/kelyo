@@ -48,8 +48,8 @@ constexpr char kRelabelScript[] = R"((() => {
     for (const el of document.querySelectorAll("button, button *")) {
       if (el.childElementCount) continue;
       const t = el.textContent;
-      if (t === "Add to Chrome") el.textContent = "Add to Ardia";
-      else if (t === "Remove from Chrome") el.textContent = "Remove from Ardia";
+      if (t === "Add to Chrome") el.textContent = "Add to Kelyo";
+      else if (t === "Remove from Chrome") el.textContent = "Remove from Kelyo";
     }
   };
   relabel();
@@ -83,7 +83,7 @@ class StoreUninstall : public extensions::UninstallDialogDelegate {
 
   void Close(bool removed) {
     extensions::ManagementUninstallFunctionBase* function = std::exchange(function_, nullptr);
-    if (function) function->OnExtensionUninstallDialogClosed(removed, removed ? std::u16string() : u"Ardia kept the extension");
+    if (function) function->OnExtensionUninstallDialogClosed(removed, removed ? std::u16string() : u"Kelyo kept the extension");
   }
 
   base::WeakPtr<StoreUninstall> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }

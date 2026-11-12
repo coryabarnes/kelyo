@@ -137,7 +137,7 @@ base::DictValue RunInstaller(LinuxCliInstallPlan plan, base::RepeatingCallback<v
   const base::FilePath cli = plan.package_directory.Append("cli");
   const base::FilePath script = base::MakeAbsoluteFilePath(cli.Append(kInstallerName));
   if (plan.package_directory.empty() || script.empty() || access(script.value().c_str(), R_OK) != 0) {
-    return Failure("The installer isn't in this build of Ardia.", version);
+    return Failure("The installer isn't in this build of Kelyo.", version);
   }
   std::vector<std::string> arguments = {"/bin/sh", script.value(), "--version", version};
   std::string digest_text;

@@ -44,9 +44,9 @@ namespace policy = linux_favicons;
 constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
     net::DefineNetworkTrafficAnnotation("ardia_linux_favicon_fetch", R"(
       semantics {
-        sender: "Ardia favicons"
+        sender: "Kelyo favicons"
         description:
-          "Downloads the favicon of a page Ardia shows without a live tab "
+          "Downloads the favicon of a page Kelyo shows without a live tab "
           "(a restored or unloaded tab, an essential or a pinned row) when "
           "its icon is not in the favicon cache."
         trigger: "The sidebar, essentials or tab strip list a page whose icon is missing."

@@ -26,6 +26,7 @@ import { importArcTheme } from "../../state/profiles/arcThemes";
 import { Row, SectionHeader } from "./Form";
 import { ColorPad, DirectionDial, LABEL, Labelled, LightnessBar, Preview, Slider } from "./ThemeControls";
 import { settingsInk } from "./tokens";
+import { isKelyoTheme, KELYO_THEMES } from "./kelyoThemes";
 
 export { arcThemeChoices, importArcTheme } from "../../state/profiles/arcThemes";
 
@@ -77,6 +78,8 @@ export function useThemeDraft(profileId: string, apply: (theme: ProfileTheme) =>
 export function ThemeSection({ profileId }: { profileId: string }) {
   const { profile, stored, custom, editsDark, shown, followsApp, change, startCustom } = useThemeDraft(profileId, (theme) => setProfileTheme(profileId, theme));
   const editing = !!profile && !!stored;
+  const [tweaking, setTweaking] = useState(false);
+  const showsEditor = !!custom && (tweaking || !KELYO_THEMES.some((preset) => isKelyoTheme(custom, preset)));
   useEffect(() => {
     if (!editing) return;
     holdThemedWindowsKeyLook(true);
@@ -101,9 +104,25 @@ export function ThemeSection({ profileId }: { profileId: string }) {
                 : PROFILE_COLORS[profile.color]?.name
           }
         >
-          <ThemeSwatches color={custom ? null : profile.color} onPreset={(c) => choosePresetColor(profileId, c)} custom={custom} onCustom={startCustom} />
+          <ThemeSwatches
+            color={custom ? null : profile.color}
+            onPreset={(c) => {
+              setTweaking(false);
+              choosePresetColor(profileId, c);
+            }}
+            custom={custom}
+            onCustom={() => {
+              setTweaking(true);
+              startCustom();
+            }}
+            onGradient={(theme) => {
+              setTweaking(false);
+              setProfileTheme(profileId, theme);
+            }}
+            tweaking={tweaking}
+          />
         </Row>
-        {custom && shown ? (
+        {custom && shown && showsEditor ? (
           <Box pad="l">
             <ThemeEditor theme={custom} full={{ shown, followsApp }} onChange={change} />
           </Box>
@@ -129,19 +148,34 @@ export function ThemePicker({
   const profileId = useWindow(windowId, (w) => w?.profileId) ?? "";
   const incognito = useWindow(windowId, (w) => w?.kind === "private");
   const look = useThemeDraft(profileId, (theme) => (onTheme ? onTheme(theme) : setProfileTheme(profileId, theme)));
+  const [tweaking, setTweaking] = useState(false);
   if (!profileId || incognito || !look.profile) return null;
   const { custom } = look;
+  const showsEditor = !!custom && (tweaking || !KELYO_THEMES.some((preset) => isKelyoTheme(custom, preset)));
   return (
     <View style={{ gap: space.xxxl }}>
       <ThemeSwatches
         size={size}
         gap={gap}
         color={custom ? null : look.profile.color}
-        onPreset={(c) => (onPreset ? onPreset(c) : choosePresetColor(profileId, c))}
+        onPreset={(c) => {
+          setTweaking(false);
+          if (onPreset) onPreset(c);
+          else choosePresetColor(profileId, c);
+        }}
         custom={custom}
-        onCustom={look.startCustom}
+        onCustom={() => {
+          setTweaking(true);
+          look.startCustom();
+        }}
+        onGradient={(theme) => {
+          setTweaking(false);
+          if (onTheme) onTheme(theme);
+          else setProfileTheme(profileId, theme);
+        }}
+        tweaking={tweaking}
       />
-      {custom ? (
+      {showsEditor ? (
         <FadeIn>
           <ThemeEditor theme={custom} onChange={look.change} />
         </FadeIn>
@@ -157,6 +191,8 @@ export function ThemeSwatches({
   onPreset,
   custom,
   onCustom,
+  onGradient,
+  tweaking = false,
   size = swatch.size,
   gap = swatch.gap,
 }: {
@@ -164,16 +200,25 @@ export function ThemeSwatches({
   onPreset: (color: ProfileColor) => void;
   custom?: ProfileTheme | null;
   onCustom?: () => void;
+  onGradient?: (theme: ProfileTheme) => void;
+  tweaking?: boolean;
   size?: number;
   gap?: number;
 }) {
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap }} accessibilityRole="radiogroup" accessibilityLabel="Theme color">
+      {onGradient
+        ? KELYO_THEMES.map((preset) => (
+            <ColorButton key={preset.name} name={preset.name} ring={preset.colors[preset.colors.length - 1]!} size={size} selected={!tweaking && isKelyoTheme(custom, preset)} onPress={() => onGradient(preset.theme)}>
+              <ThemeSwatch colors={flatColors(preset.theme)} angle={lookAngle(preset.theme)} style={{ flex: 1 }} />
+            </ColorButton>
+          ))
+        : null}
       {COLORS.map((c) => (
-        <ColorButton key={c} name={PROFILE_COLORS[c].name} ring={PROFILE_COLORS[c].swatch} size={size} selected={color === c} onPress={() => onPreset(c)} />
+        <ColorButton key={c} name={PROFILE_COLORS[c].name} ring={PROFILE_COLORS[c].swatch} size={size} selected={!custom && color === c} onPress={() => onPreset(c)} />
       ))}
       {onCustom ? (
-        <ColorButton name="Custom" ring={custom ? themeAccent(custom) : settingsInk.customSwatch} size={size} selected={!!custom} onPress={onCustom}>
+        <ColorButton name="Custom" ring={custom ? themeAccent(custom) : settingsInk.customSwatch} size={size} selected={!!custom && (tweaking || !(onGradient && KELYO_THEMES.some((preset) => isKelyoTheme(custom, preset))))} onPress={onCustom}>
           <CustomSwatch theme={custom ?? null} />
         </ColorButton>
       ) : null}

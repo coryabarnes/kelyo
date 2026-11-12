@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { View } from "react-native";
-import type { PowerUpProps, WindowBackdropProps } from "@ardia-real/shaders";
+import type { PowerUpProps, ThemeSwatchProps, WindowBackdropProps } from "@ardia-real/shaders";
 import { useBrowser } from "../../../browser/src/state/browser/store";
 import { prefersReducedMotion } from "./web/gl/clock";
 import { parseHex } from "./web/gl/colors";
@@ -69,3 +69,33 @@ export function PowerUp({ palette = "pink", speed = POWER_UP.defaultSpeed, origi
     </View>
   );
 }
+
+const swatchColor = (colors: number[], index: number) => {
+  const [r = 0, g = 0, b = 0, a = 1] = colors.slice(index * 4, index * 4 + 4);
+  return `rgb(${Math.round(r * 255)} ${Math.round(g * 255)} ${Math.round(b * 255)} / ${a})`;
+};
+
+function huePad(lightness: number) {
+  const l = Math.round(lightness * 100);
+  const hues = Array.from({ length: 13 }, (_, i) => `hsl(${i * 30} 100% ${l}%)`).join(", ");
+  return `radial-gradient(closest-side, hsl(0 0% ${l}%), hsl(0 0% ${l}% / 0)), conic-gradient(from 90deg, ${hues})`;
+}
+
+export function ThemeSwatch({ colors, angle = 135, padLightness = -1, style }: ThemeSwatchProps) {
+  if (colors.length === 0 && padLightness >= 0) {
+    return (
+      <View pointerEvents="none" style={[{ overflow: "hidden", borderRadius: 999 }, style]}>
+        <div style={{ position: "absolute", inset: 0, background: huePad(padLightness) }} />
+      </View>
+    );
+  }
+  const count = Math.max(1, Math.floor(colors.length / 4));
+  const stops = Array.from({ length: count }, (_, i) => swatchColor(colors, i));
+  const background = count === 1 ? stops[0] : `linear-gradient(in oklab ${angle}deg, ${stops.join(", ")})`;
+  return (
+    <View pointerEvents="none" style={[{ overflow: "hidden", borderRadius: 999 }, style]}>
+      <div style={{ position: "absolute", inset: 0, background }} />
+    </View>
+  );
+}
+

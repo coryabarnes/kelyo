@@ -6,6 +6,7 @@ import { credentialWording } from "./credentialWording";
 import { linuxWording } from "./linuxWording";
 import { calendarWording } from "./calendarWording";
 import { syncWording } from "./syncWording";
+import { kelyoBrand } from "./kelyoBrand";
 import { hasMacModifiers, linuxShortcutText } from "./shortcutText";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -80,7 +81,7 @@ function linuxComponents(): Plugin {
 }
 
 export default webShellConfig({
-  plugins: [linuxComponents(), credentialWording(), linuxWording(), calendarWording(), syncWording()],
+  plugins: [linuxComponents(), credentialWording(), linuxWording(), calendarWording(), syncWording(), kelyoBrand()],
   aliases: [
     { find: /^@ardia\/shell$/, replacement: here("./src/shims/shell.tsx") },
     { find: /^@ardia\/ardiacore$/, replacement: here("./src/shims/ardiacore.tsx") },

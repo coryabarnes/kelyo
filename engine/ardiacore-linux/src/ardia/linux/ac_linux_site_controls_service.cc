@@ -290,7 +290,7 @@ class LinuxContentBlocker : public ProfileObserver, public content::WebContentsO
     if (ok || load_ != Load::kLoaded) return;
     const int failed = inherit_attempts_++;
     if (inherit_attempts_ >= controls::kInheritAttempts) {
-      LOG(WARNING) << "Ardia content blocker: an isolated profile didn't take the default profile's settings: "
+      LOG(WARNING) << "Kelyo content blocker: an isolated profile didn't take the default profile's settings: "
                    << error;
       return;
     }
@@ -312,7 +312,7 @@ class LinuxContentBlocker : public ProfileObserver, public content::WebContentsO
       if (!leader) return;
       std::optional<controls::BlockerSettings> parsed = ok ? controls::ParseBlockerSettings(settings) : std::nullopt;
       if (!parsed) {
-        LOG(WARNING) << "Ardia content blocker: the default profile's settings can't be copied: "
+        LOG(WARNING) << "Kelyo content blocker: the default profile's settings can't be copied: "
                      << ErrorText(settings, "no settings to copy");
         return;
       }
@@ -322,7 +322,7 @@ class LinuxContentBlocker : public ProfileObserver, public content::WebContentsO
         follow.settings = *parsed;
         blocker->Call(std::move(follow), base::BindOnce([](bool ok, base::Value result) {
           if (!ok) {
-            LOG(WARNING) << "Ardia content blocker: an isolated profile didn't follow the default profile: "
+            LOG(WARNING) << "Kelyo content blocker: an isolated profile didn't follow the default profile: "
                          << ErrorText(result, "no answer");
           }
         }));
@@ -363,7 +363,7 @@ class LinuxContentBlocker : public ProfileObserver, public content::WebContentsO
       if (id != controls::kExtensionId || !enabled || enabled->path() != root_) {
         if (loader && !id.empty()) loader->Remove(id);
         load_ = Load::kFailed;
-        LOG(ERROR) << "Ardia's content blocker did not load from " << root_.value();
+        LOG(ERROR) << "Kelyo's content blocker did not load from " << root_.value();
         ReleaseHold("the content blocker didn't load");
         return FailAll("the content blocker didn't load");
       }
@@ -509,7 +509,7 @@ class LinuxContentBlocker : public ProfileObserver, public content::WebContentsO
   void Finish(controls::BlockerQueue::Outcome outcome) {
     if (outcome.reset_page) ResetPage();
     if (outcome.retry) return;
-    if (outcome.error) LOG(WARNING) << "Ardia content blocker: " << *outcome.error;
+    if (outcome.error) LOG(WARNING) << "Kelyo content blocker: " << *outcome.error;
     Respond(outcome.call, outcome.error ? nullptr : &outcome.value,
             outcome.error ? *outcome.error : std::string());
   }

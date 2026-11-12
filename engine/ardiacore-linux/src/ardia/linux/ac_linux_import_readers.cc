@@ -620,7 +620,7 @@ std::string LowerName(std::string text) {
 }
 
 std::string PortalReason(const BrowserDefinition& browser) {
-  return std::string("The desktop portal gives each app its own key, so Ardia can't read ") + browser.name + "'s.";
+  return std::string("The desktop portal gives each app its own key, so Kelyo can't read ") + browser.name + "'s.";
 }
 
 bool IsWebUrl(std::string_view url) {
@@ -1058,7 +1058,7 @@ ImportOutcome ReadBrowserProfile(const Environment& environment, std::string_vie
         if (cookies.portal > 0) {
           warn(name, "undecryptable", Plural(cookies.portal, "cookie") + " protected by the desktop portal " +
                                           (cookies.portal == 1 ? "wasn't" : "weren't") + " imported. " +
-                                          PortalReason(*browser) + " Sign in to those sites again in Ardia.");
+                                          PortalReason(*browser) + " Sign in to those sites again in Kelyo.");
         }
         if (cookies.undecryptable > 0) {
           warn(name, "undecryptable", Plural(cookies.undecryptable, "cookie") + " couldn't be decrypted");
@@ -1083,7 +1083,7 @@ ImportOutcome ReadBrowserProfile(const Environment& environment, std::string_vie
         if (autofill.portal > 0) {
           warn(name, "undecryptable", Plural(autofill.portal, "card") + " protected by the desktop portal " +
                                           (autofill.portal == 1 ? "wasn't" : "weren't") + " imported. " +
-                                          PortalReason(*browser) + " Add those cards again in Ardia.");
+                                          PortalReason(*browser) + " Add those cards again in Kelyo.");
         }
         if (autofill.undecryptable > 0) {
           warn(name, "undecryptable", Plural(autofill.undecryptable, "card") + " couldn't be decrypted");

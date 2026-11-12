@@ -619,7 +619,7 @@ void LinuxPickFolder(gfx::NativeWindow window, const base::ListValue& values, Do
   const std::string current = !values.empty() && values[0].is_string() ? values[0].GetString() : std::string();
   const std::string prompt = values.size() == 2 && values[1].is_string() ? values[1].GetString() : std::string();
   if (ardiacore::BackgroundInstance()) {
-    LOG(INFO) << "Ardia background instance: folder picker requested";
+    LOG(INFO) << "Kelyo background instance: folder picker requested";
     return std::move(done).Run(true, base::Value());
   }
   if (!ChromeSelectFilePolicy::FileSelectDialogsAllowed())
@@ -643,7 +643,7 @@ void LinuxPickFiles(gfx::NativeWindow window, const base::ListValue& values, Don
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   if (!values.empty()) return Fail(std::move(done), "ERR_FILES_REQUEST", "Choosing files to open takes no arguments");
   if (ardiacore::BackgroundInstance()) {
-    LOG(INFO) << "Ardia background instance: file picker requested";
+    LOG(INFO) << "Kelyo background instance: file picker requested";
     return std::move(done).Run(true, base::Value(base::ListValue()));
   }
   if (!ChromeSelectFilePolicy::FileSelectDialogsAllowed())

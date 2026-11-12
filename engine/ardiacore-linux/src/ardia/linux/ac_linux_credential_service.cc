@@ -403,7 +403,7 @@ class ExportPicker : public ui::SelectFileDialog::Listener {
     types.include_all_files = true;
     views::Widget* widget = shell ? shell->GetWidget() : nullptr;
     picker->dialog_->SelectFile(ui::SelectFileDialog::SELECT_SAVEAS_FILE, u"Export Passwords",
-                                default_dir.Append(FILE_PATH_LITERAL("Ardia Passwords.csv")), &types, 1,
+                                default_dir.Append(FILE_PATH_LITERAL("Kelyo Passwords.csv")), &types, 1,
                                 FILE_PATH_LITERAL("csv"),
                                 widget ? widget->GetNativeWindow() : gfx::NativeWindow());
   }

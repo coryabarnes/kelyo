@@ -183,7 +183,7 @@ class ControlIo {
 
   SocketState Start(const base::FilePath& data_directory) {
     if (bound_) return SocketState{true, generation_, bound_->path, std::string()};
-    if (data_directory.empty()) return Refuse("Ardia has no data folder.", std::string());
+    if (data_directory.empty()) return Refuse("Kelyo has no data folder.", std::string());
     const std::string directory = data_directory.value();
     const std::string path = data_directory.Append(control::kSocketName).value();
     if (const std::string problem = control::UnsafeFolder(directory); !problem.empty()) return Refuse(problem, path);
@@ -193,7 +193,7 @@ class ControlIo {
     const std::string lock_path = data_directory.Append(control::kLockName).value();
     base::ScopedFD lock(HANDLE_EINTR(open(lock_path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600)));
     if (!lock.is_valid()) return Refuse("Couldn't open the socket's lock file (" + ErrnoText() + ").", path);
-    if (flock(lock.get(), LOCK_EX | LOCK_NB) != 0) return Refuse("Another Ardia is serving this data folder.", path);
+    if (flock(lock.get(), LOCK_EX | LOCK_NB) != 0) return Refuse("Another Kelyo is serving this data folder.", path);
     struct stat old;
     if (lstat(path.c_str(), &old) == 0) {
       if (!S_ISSOCK(old.st_mode)) return Refuse(path + " exists and isn't a socket, so it was left alone.", path);
@@ -348,7 +348,7 @@ class Automation {
   }
 
   void Start(const LinuxAutomationCaller& caller, base::OnceCallback<void(base::DictValue)> done) {
-    if (quitting_) return std::move(done).Run(StatusValue(SocketState{false, generation_, path_, "Ardia is quitting."}));
+    if (quitting_) return std::move(done).Run(StatusValue(SocketState{false, generation_, path_, "Kelyo is quitting."}));
     if (!caller.eligible) {
       return std::move(done).Run(StatusValue(
           SocketState{false, generation_, path_, "Only a browser window serves the ardia command's socket."}));

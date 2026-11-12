@@ -562,7 +562,7 @@ FolderCheck CheckDownloadFolder(const std::string& path) {
   }
   if (!S_ISDIR(info.st_mode)) return {false, "ERR_FOLDER_TYPE", "That isn't a folder"};
   if (access(path.c_str(), W_OK | X_OK) != 0) {
-    return {false, "ERR_FOLDER_NOT_WRITABLE", "Ardia can't save downloads in that folder"};
+    return {false, "ERR_FOLDER_NOT_WRITABLE", "Kelyo can't save downloads in that folder"};
   }
   return {true, {}, {}};
 }

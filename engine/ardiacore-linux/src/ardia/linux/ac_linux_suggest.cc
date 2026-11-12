@@ -45,10 +45,10 @@ namespace policy = ardia::linux_suggest_policy;
 constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
     net::DefineNetworkTrafficAnnotation("ardia_linux_search_suggestions", R"(
       semantics {
-        sender: "Ardia command bar"
+        sender: "Kelyo command bar"
         description:
           "Asks the default search engine for query completions while the "
-          "user types in the Ardia command bar."
+          "user types in the Kelyo command bar."
         trigger: "Typing a search in the command bar with search suggestions on."
         user_data {
           type: USER_CONTENT

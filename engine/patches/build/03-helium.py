@@ -404,7 +404,7 @@ def stage_brand_namesub(ctx):
         strings = ctx.tree / 'chrome/app/settings_chromium_strings.grdp'
         text = strings.read_text()
         if 'helium.desktop' in text:
-            strings.write_text(text.replace('helium.desktop', 'ardia.desktop'))
+            strings.write_text(text.replace('helium.desktop', 'kelyo.desktop'))
     p = subprocess.run([sys.executable, str(script), '--tree', str(ctx.tree), '--helium', str(ctx.hc)],
                        cwd=ctx.work, capture_output=True, text=True)
     if p.returncode:

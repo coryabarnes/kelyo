@@ -894,7 +894,7 @@ Failure FirefoxKeyFailure(FirefoxKey status, std::string_view what) {
     case FirefoxKey::kLocked:
       return Failure{"locked", "A Firefox primary password protects " + std::string(what)};
     case FirefoxKey::kUnsupported:
-      return Failure{"unsupported", "key4.db uses an encryption Ardia can't read"};
+      return Failure{"unsupported", "key4.db uses an encryption Kelyo can't read"};
     case FirefoxKey::kMissing:
       return Failure{"unreadable", "key4.db holds no key for " + std::string(what)};
     case FirefoxKey::kMalformed:

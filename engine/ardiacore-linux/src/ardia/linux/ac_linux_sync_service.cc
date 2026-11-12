@@ -63,7 +63,7 @@ constexpr int kMaxArgDepth = 3;
 constexpr size_t kMaxArgs = 8;
 constexpr char kLockedMessage[] = "Sync isn't set up on this device.";
 constexpr char16_t kDisclosurePurpose[] = u"show your sync recovery phrase";
-constexpr char kKeyDirectory[] = "Ardia Sync Keys";
+constexpr char kKeyDirectory[] = "Kelyo Sync Keys";
 constexpr char kSkippedLogin[] = "skipped";
 
 struct UiState {
@@ -459,7 +459,7 @@ void LinuxSyncInvoke(const LinuxSyncCaller& caller, Profile* app_profile, LinuxS
       return std::move(done).Run(true, base::Value());
     case sync::Route::kLeased:
       if (!Ui().lease.Holds(caller.key, NowMs()))
-        return Fail(std::move(done), "ERR_SYNC_NOT_AUTHORITY", "Another Ardia window is running sync");
+        return Fail(std::move(done), "ERR_SYNC_NOT_AUTHORITY", "Another Kelyo window is running sync");
       if (RevokesDisclosure(method)) Ui().disclosure.Revoke();
       return Post(method, std::move(args), base::BindOnce(
           [](bool revoke, Done done, sync::Outcome outcome) {
@@ -469,7 +469,7 @@ void LinuxSyncInvoke(const LinuxSyncCaller& caller, Profile* app_profile, LinuxS
           RevokesDisclosure(method), std::move(done)));
     case sync::Route::kPasswords:
       if (!Ui().lease.Holds(caller.key, NowMs()))
-        return Fail(std::move(done), "ERR_SYNC_NOT_AUTHORITY", "Another Ardia window is running sync");
+        return Fail(std::move(done), "ERR_SYNC_NOT_AUTHORITY", "Another Kelyo window is running sync");
       SyncPasswords(method, args, std::move(done));
       for (auto& arg : args) sync::WipeJson(arg);
       return;

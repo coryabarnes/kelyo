@@ -14,7 +14,7 @@ namespace ardia::linux_import {
 inline constexpr std::string_view kSecretSchemaV2 = "chrome_libsecret_os_crypt_password_v2";
 inline constexpr std::string_view kSecretSchemaV1 = "chrome_libsecret_os_crypt_password";
 inline constexpr std::string_view kFirefoxSecretSchema = "mozilla.firefox";
-inline constexpr std::string_view kKWalletAppId = "Ardia";
+inline constexpr std::string_view kKWalletAppId = "Kelyo";
 inline constexpr int kKeyringProbeTimeoutMs = 3000;
 inline constexpr int kKeyringPromptTimeoutMs = 120000;
 

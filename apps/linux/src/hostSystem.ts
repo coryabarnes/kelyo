@@ -1,12 +1,13 @@
 import { hostSupports, type ArdiaHost } from "./host.ts";
 import { linuxCapabilities, unavailableError } from "./hostCapabilities.ts";
+import * as kelyoIntroMusic from "./kelyoIntroMusic.ts";
 
-const INTRO_MUSIC = new Set(["playIntroMusic", "setIntroMusicMuted", "stopIntroMusic"]);
+const INTRO_MUSIC = new Set(["playIntroMusic", "setIntroMusicMuted", "stopIntroMusic"] as const);
 
 export function linuxModuleMethod(host: ArdiaHost, name: string, method: string): ((...args: unknown[]) => Promise<unknown>) | undefined {
   if (name === "ArdiaSystem") return linuxSystemMethod(host, method);
   if (name !== "ArdiaApp" || hostSupports(`${name}.${method}`, host)) return undefined;
-  if (INTRO_MUSIC.has(method)) return () => Promise.resolve();
+  if (INTRO_MUSIC.has(method as never)) return kelyoIntroMusic[method as "playIntroMusic"] as (...args: unknown[]) => Promise<unknown>;
   if (method === "openExternalURL") return () => Promise.resolve(false);
   return undefined;
 }

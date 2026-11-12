@@ -524,7 +524,7 @@ class ImportService {
     vault_.Expire(NowMs());
     imported_.Expire(NowMs());
     unlocked_.Expire(NowMs());
-    if (terminating_) return Fail(std::move(done), "ERR_SHUTTING_DOWN", "Ardia is quitting");
+    if (terminating_) return Fail(std::move(done), "ERR_SHUTTING_DOWN", "Kelyo is quitting");
     if (method == "ArdiaImport.listBrowsers") return ListBrowsers(std::move(done));
     if (method == "ArdiaImport.startImport") return StartImport(std::move(requester), values, std::move(done));
     if (method == "ArdiaImport.cancelImport") {

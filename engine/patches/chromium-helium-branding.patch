@@ -30,7 +30,7 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
    CHECK(product_info);
  
 -  const char* product_name = "Helium";
-+  const char* product_name = "Ardia";
++  const char* product_name = "Kelyo";
  
  #if BUILDFLAG(IS_ANDROID)
    std::string_view version = version_info::GetVersionNumber();
@@ -190,12 +190,12 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
      const GURL& url) {
    if (!url.has_host() || url.HostIsIPAddress()) {
 -    return u"helium_screenshot.png";
-+    return u"ardia_screenshot.png";
++    return u"kelyo_screenshot.png";
    }
  
    return base::ASCIIToUTF16(
 -      base::StrCat({"helium_screenshot_", url.GetHost(), ".png"}));
-+      base::StrCat({"ardia_screenshot_", url.GetHost(), ".png"}));
++      base::StrCat({"kelyo_screenshot_", url.GetHost(), ".png"}));
  }
  
  void ScreenshotCapturedBubble::DownloadButtonPressed() {
@@ -248,7 +248,7 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
      additional: commentLines.join('\n'),
    };
 -  let href = 'https://github.com/imputnet/helium/issues/new';
-+  let href = 'https://github.com/mantrakp04/ardia/issues/new';
++  let href = 'https://github.com/coryabarnes/kelyo/issues/new';
    for (const param in params) {
      href = appendParam(href, param, params[param]!);
    }
@@ -259,13 +259,13 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
            };
          } else {
 -          console.warn('Helium: unverified Chrome eligibility check: ' +
-+          console.warn('Ardia: unverified Chrome eligibility check: ' +
++          console.warn('Kelyo: unverified Chrome eligibility check: ' +
                String(key));
          }
          eligibilityCandidates.set(key, override);
          if (eligibilityCandidates.size > 1) {
 -          console.warn('Helium: ambiguous Chrome eligibility check: ' +
-+          console.warn('Ardia: ambiguous Chrome eligibility check: ' +
++          console.warn('Kelyo: ambiguous Chrome eligibility check: ' +
                Array.from(eligibilityCandidates.keys(), String).join(', '));
          }
        } else {
@@ -276,7 +276,7 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
    const replaceDownloadButtonText = (el) => {
      if (el.nodeType === Node.TEXT_NODE) {
 -      const replacement = el.nodeValue.replace(CHROME_NAME_REGEX, 'Helium');
-+      const replacement = el.nodeValue.replace(CHROME_NAME_REGEX, 'Ardia');
++      const replacement = el.nodeValue.replace(CHROME_NAME_REGEX, 'Kelyo');
        if (replacement === el.nodeValue) {
          return false;
        }
@@ -323,7 +323,7 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
              1,
              "Automatic component updates are now available. They're managed by the same toggle that enables automatic browser updates.\n"
 -            "From now on, you'll be notified about major changes to Helium services. Even though these notifications are extremely rare, you can choose to ignore them and accept all future changes automatically."
-+            "From now on, you'll be notified about major changes to Ardia services. Even though these notifications are extremely rare, you can choose to ignore them and accept all future changes automatically."
++            "From now on, you'll be notified about major changes to Kelyo services. Even though these notifications are extremely rare, you can choose to ignore them and accept all future changes automatically."
            }
        });
  
@@ -541,8 +541,8 @@ icons already replaced from ardia_resources.txt); it covers what those can't rea
      {
 -      'opensource_project': 'Helium',
 -      'opensource_link': 'https://github.com/imputnet/helium',
-+      'opensource_project': 'Ardia',
-+      'opensource_link': 'https://github.com/mantrakp04/ardia',
++      'opensource_project': 'Kelyo',
++      'opensource_link': 'https://github.com/coryabarnes/kelyo',
      },
      escape=False,
    )

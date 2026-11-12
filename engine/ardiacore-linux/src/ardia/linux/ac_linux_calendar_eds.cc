@@ -237,7 +237,7 @@ int Remaining(Clock::time_point deadline, int cap) {
 }
 
 EdsResult OutOfTime() {
-  EdsResult result{EdsStatus::kFailed, "Ardia ran out of time before this calendar answered"};
+  EdsResult result{EdsStatus::kFailed, "Kelyo ran out of time before this calendar answered"};
   result.timed_out = true;
   return result;
 }
@@ -311,7 +311,7 @@ class SessionClient final : public EdsClient {
     }
     const auto cooling = cooling_.find(uid);
     if (cooling != cooling_.end() && Clock::now() < cooling->second) {
-      objects.result = {EdsStatus::kFailed, "This calendar didn't answer recently, so Ardia is skipping it for now"};
+      objects.result = {EdsStatus::kFailed, "This calendar didn't answer recently, so Kelyo is skipping it for now"};
       objects.result.timed_out = true;
       return objects;
     }
@@ -364,7 +364,7 @@ class SessionClient final : public EdsClient {
 
   [[clang::no_sanitize("cfi-icall")]] EdsResult Connect() {
     const Gio& gio = Library();
-    if (!gio.loaded) return {EdsStatus::kUnavailable, "GIO is unavailable, so Ardia can't reach the D-Bus session bus"};
+    if (!gio.loaded) return {EdsStatus::kUnavailable, "GIO is unavailable, so Kelyo can't reach the D-Bus session bus"};
     if (bus_ && !gio.is_closed(bus_)) return {};
     if (bus_) {
       for (auto& [uid, calendar] : calendars_) Release(calendar, false);

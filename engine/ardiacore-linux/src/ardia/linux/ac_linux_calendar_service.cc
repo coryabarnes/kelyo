@@ -248,7 +248,7 @@ class LinuxCalendarService {
 
   Reply RequestAccess(const base::FilePath& documents) {
     if (!WriteConsent(documents)) {
-      return Failure("ERR_CALENDAR_FAILED", "Ardia couldn't save the calendar connection");
+      return Failure("ERR_CALENDAR_FAILED", "Kelyo couldn't save the calendar connection");
     }
     std::vector<eds::EdsSource> sources;
     const eds::EdsResult result = Client().Sources(&sources);

@@ -89,7 +89,7 @@ void Hold::Release(std::string why) {
   std::unique_ptr<Hold> self = std::move(found->second);
   Holds().erase(found);
   if (!why.empty()) {
-    LOG(WARNING) << "Ardia content blocker: " << throttles_.size()
+    LOG(WARNING) << "Kelyo content blocker: " << throttles_.size()
                  << " held navigations go ahead without its blocking: " << why;
   }
   for (base::WeakPtr<HoldThrottle>& throttle : throttles_) {
