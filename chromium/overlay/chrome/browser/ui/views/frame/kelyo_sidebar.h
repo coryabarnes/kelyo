@@ -18,4 +18,12 @@ inline constexpr ui::ClassProperty<bool> kKelyoToolbarInSidebarValue = {
 inline constexpr const ui::ClassProperty<bool>* kKelyoToolbarInSidebarKey =
     &kKelyoToolbarInSidebarValue;
 
+// While the toolbar is in the sidebar, its first row shares the top of the
+// window with the window buttons; this is the width they take (from the
+// sidebar's leading edge), so the toolbar's buttons start after them.
+inline constexpr ui::ClassProperty<int> kKelyoToolbarLeadingInsetValue = {
+    0, "kKelyoToolbarLeadingInsetKey", false, nullptr};
+inline constexpr const ui::ClassProperty<int>* kKelyoToolbarLeadingInsetKey =
+    &kKelyoToolbarLeadingInsetValue;
+
 #endif  // CHROME_BROWSER_UI_VIEWS_FRAME_KELYO_SIDEBAR_H_
